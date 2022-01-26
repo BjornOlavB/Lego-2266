@@ -21,7 +21,7 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.205.254"
+EV3_IP = "169.254.91.12"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
@@ -153,10 +153,10 @@ def unpackData(rowOfData):
 
     # målinger
     Tid.append(rowOfData["Tid"])
-    # Lys.append(rowOfData["Lys"])
+    Lys.append(rowOfData["Lys"])
     
     # egne variable
-    # Ts.append(rowOfData["Ts"])
+    Ts.append(rowOfData["Ts"])
     Flow.append(rowOfData["Flow"])
     Volum.append(rowOfData["Volum"])
     

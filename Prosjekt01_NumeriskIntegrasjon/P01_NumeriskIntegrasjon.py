@@ -32,6 +32,8 @@ import json
 import _thread
 import sys
 
+
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #            1) EXPERIMENT SETUP AND FILENAME
 #
@@ -347,12 +349,14 @@ def MathCalculations(Tid, Lys, Volum, Ts, Flow ):
     
 
     
-
+    
     # Matematiske beregninger 
     nullflow = Lys[0]
-    Flowrate = Lys - nullflow
+    Flowrate = Lys[-1] - nullflow
+    print(Flowrate)
     Flow.append(Flowrate)
-    Volum.append(EulerForward(Flowrate,Tid,Volum))
+    if len(Tid) > 1:
+        Volum.append(EulerForward(Flow,Ts,Volum))
     # Pådragsberegning
     
 
@@ -361,9 +365,9 @@ def MathCalculations(Tid, Lys, Volum, Ts, Flow ):
 
 
 
-def EulerForward(Flow, Tid,Volum):
-    Volum = Volum[-1] + (Tid[-1]-Tid[-2])*Flow[-1]
-    return Volum
+def EulerForward(Flow, Ts,Volum):
+    volum = Volum[-1] + Ts[-1]*Flow[-1]
+    return volum
 
 
 
