@@ -350,9 +350,9 @@ def MathCalculations(Tid, Lys, Volum, Ts, Flow ):
 
     # Matematiske beregninger 
     nullflow = Lys[0]
-    Flowrate = Lys - nullflow
-    Flow.append(Flowrate)
-    Volum.append(EulerForward(Flowrate,Tid,Volum))
+    Flow = Lys - nullflow
+    Flow.append(Flow)
+    Volum.append(EulerForward(Flow,Tid,Volum))
     # Pådragsberegning
     
 
