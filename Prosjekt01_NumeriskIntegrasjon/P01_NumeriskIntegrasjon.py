@@ -203,7 +203,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene. 
             
-            MathCalculations(Tid, Lys, Flow, Volum)
+            MathCalculations(Tid, Lys, Flow, Volum, Ts)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -333,15 +333,26 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Flow, Volum):
+def MathCalculations(Tid, Lys, Volum, Ts, Flow ):
 
     # Parametre
     
+    
     # Initialverdibereging
     if len(Tid) == 1:
+        Ts.append(0)
+        Volum.append(0)
+    else:
+        Ts.append(Tid[-1]-Tid[-2])
     
+
+    
+
     # Matematiske beregninger 
-    
+    nullflow = Lys[0]
+    Flowrate = Lys - nullflow
+    Flow.append(Flowrate)
+    Volum.append(EulerForward(Flowrate,Tid,Volum))
     # Pådragsberegning
     
 
@@ -350,7 +361,11 @@ def MathCalculations(Tid, Lys, Flow, Volum):
 
 
 
-#def EulerForward(.....):
+def EulerForward(Flow, Tid,Volum):
+    Volum = Volum[-1] + (Tid[-1]-Tid[-2])*Flow[-1]
+    return Volum
+
+
 
 
 if __name__ == '__main__':
