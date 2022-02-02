@@ -18,23 +18,23 @@ except Exception as e:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = True
+online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.91.12"
+EV3_IP = "169.254.224.208"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P01_NumeriskIntegrasjon.txt"
+filenameMeas = "Meas_P01_NumeriskIntegrasjon-Sinus-3.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå 
 #     filenameCalcOffline = ".txt"
-filenameCalcOffline = "CalcOffline_P01_NumeriskIntegrasjon.txt"
+filenameCalcOffline = "CalcOffline_P01_NumeriskIntegrasjon-sinus.txt"
 #---------------------------------------------------------------------
 
 
@@ -236,7 +236,7 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys, Flow, Volum, Ts)
+            MathCalculations(Tid, Lys, Volum, Ts, Flow)
             #---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
