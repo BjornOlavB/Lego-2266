@@ -342,7 +342,9 @@ def main():
 def MathCalculations(t, l,ts, T_k, T_fir,T_iir, k):
 
     # Parametre
-    alpha = 1  # MÅ VÆRE MELLOM 0 og 1  !!!
+    alpha = 0.5     # MÅ VÆRE MELLOM 0 og 1  !!!
+    m = k           # m-Siste målinger 
+                    #OBS! ----- Sett m = k i online
 
     # Initialverdibereging
 
@@ -356,7 +358,7 @@ def MathCalculations(t, l,ts, T_k, T_fir,T_iir, k):
         T_k.append(l)
     
         # Matematiske beregninger 
-        T_fir.appdend(FIR_filter(T_k, k))
+        T_fir.appdend(FIR_filter(T_k, k,m))
         T_iir.append(IIR_filter(T_k,k,T_iir,alpha))
     # Pådragsberegning
     
@@ -365,11 +367,15 @@ def MathCalculations(t, l,ts, T_k, T_fir,T_iir, k):
 
 
 
-
-def FIR_filter(list,index):
-    m = index + 1                       # m > k
-    FIR_Value = (1/m)*(sum(list))       # Glatting av målinger i FIR filter
-    return FIR_Value                    # Retynering av utregnet verdi
+# Funker bedre i offline
+def FIR_filter(list,index,m):
+                                                    
+    n = m-1                                       # For riktig indexering
+    if len(list) < m:
+        m = len(list)                             # sjekker at m ikke er større en k
+                       
+    FIR_Value = (1/m)*(sum(list[index-n:]))       # Glatting av målinger i FIR filter
+    return FIR_Value                              # Retunering av utregnet verdi
 
 def IIR_filter(list,index,IIR_prev,alpha):
     if len(list) <= 0:                                          
