@@ -9,7 +9,7 @@ try:
     #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # ----> Husk å oppdatere denne !!!!!!!!!!!!!!
     #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    from P0X_BeskrivendeTekst import MathCalculations
+    from P02_Filtrering import MathCalculations
 except Exception as e:
     pass
     # print(e)

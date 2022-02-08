@@ -26,7 +26,7 @@ try:
     import styrestikke.config
 except Exception as e:
     pass  # for å kunne eksportere funksjoner
-from contextlib import nullcontext
+
 import math
 import struct
 import socket
@@ -34,7 +34,7 @@ import json
 import _thread
 import sys
 
-from P02_Plott import Tid
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #            1) EXPERIMENT SETUP AND FILENAME
