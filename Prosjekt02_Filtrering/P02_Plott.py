@@ -21,7 +21,7 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.123.25"
+EV3_IP = "169.254.78.65"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
@@ -134,6 +134,11 @@ else:
 def unpackMeasurement(rowOfMeasurement):
     Tid.append(float(rowOfMeasurement[0]))
     Lys.append(int(rowOfMeasurement[1]))
+
+    TempKaffe.append(int(rowOfMeasurement[2]))
+    TempFilterFIR.append(int(rowOfMeasurement[3]))
+    TempFilterIIR.append(int(rowOfMeasurement[4]))
+    Ts.append(int(rowOfMeasurement[5]))
     
     # i malen her mangler mange målinger, fyll ut selv det du trenger
         
@@ -165,8 +170,8 @@ def unpackData(rowOfData):
     # egne variable
     Ts.append(rowOfData["Ts"])
     TempKaffe.append(rowOfData["TempKaffe"])
-    TempFilterFIR.append(rowOfData["Temp_FIR"])
-    TempFilterIIR.append(rowOfData["Temp_IIR"])
+    TempFilterFIR.append(rowOfData["Filter_FIR"])
+    TempFilterIIR.append(rowOfData["Filter_IIR"])
 
                 
 #-------------------------------------------------------------

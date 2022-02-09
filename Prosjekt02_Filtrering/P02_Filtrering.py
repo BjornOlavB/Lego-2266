@@ -275,8 +275,9 @@ def main():
 
                 # egne variable
                 DataToOnlinePlot["Ts"] = (Ts[-1])
-                DataToOnlinePlot["Filter-FIR"] = (TempFilterFIR[-1])
-                DataToOnlinePlot["Filter-IIR"] = (TempFilterIIR[-1])
+                DataToOnlinePlot["TempKaffe"] = (TempKaffe[-1])
+                DataToOnlinePlot["Filter_FIR"] = (TempFilterFIR[-1])
+                DataToOnlinePlot["Filter_IIR"] = (TempFilterIIR[-1])
                 
 
                 # sender over data
@@ -348,18 +349,17 @@ def MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR, k):
 
     # Initialverdibereging
 
-    if len(Tid) == 0:
+    if len(Tid) == 1:
         Ts.append(0)
-        Tid.append(0)
         TempKaffe.append(Lys[0])
         TempFilterFIR.append(TempKaffe[0])
         TempFilterIIR.append(TempKaffe[0])
     else:
-        Ts.appdend(Tid[-1]-Tid[-2])  
-        TempKaffe.append(-1)
+        Ts.append(Tid[-1]-Tid[-2])  
+        TempKaffe.append(Lys[-1])
     
         # Matematiske beregninger 
-        TempFilterFIR.appdend(FIR_filter(TempKaffe, k,m))
+        TempFilterFIR.append(FIR_filter(TempKaffe, k,m))
         TempFilterIIR.append(IIR_filter(TempKaffe,k,TempFilterIIR,alpha))
     # Pådragsberegning
     
@@ -379,9 +379,7 @@ def FIR_filter(list,index,m):
     return FIR_Value                              # Retunering av utregnet verdi
 
 def IIR_filter(list,index,IIR_prev,alpha):
-    if len(list) <= 0:                                          
-        return list [0]
-    else:
+
         IIR_Value = alpha*list[index]+(1-alpha)*IIR_prev[index-1]
         return IIR_Value
 
