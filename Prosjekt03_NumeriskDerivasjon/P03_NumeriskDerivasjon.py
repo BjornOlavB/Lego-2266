@@ -69,7 +69,7 @@ def main():
         robot = Initialize(wired,filenameMeas,filenameCalcOnline)
 
         # oppdater portnummer
-        myColorSensor = ColorSensor(Port.SX)
+        myColorSensor = ColorSensor(Port.S1)
        
 
         # Sjekker at joystick er tilkoplet EV3 
@@ -281,11 +281,12 @@ def main():
 
                 # egne variable
                 DataToOnlinePlot["Ts"] = (Ts[-1])
+                DataToOnlinePlot["MåltAvstand"] = (MåltAvstand[-1])
                 DataToOnlinePlot["Avstand_FIR"] = (Avstand_FIR[-1])
-                DataToOnlinePlot["Avstand-IIR"] = (Avstand_IIR[-1])
+                DataToOnlinePlot["Avstand_IIR"] = (Avstand_IIR[-1])
                 DataToOnlinePlot["Fart"] = (Fart[-1])
-                DataToOnlinePlot["Fart-FIR"] = (Fart_FIR[-1])
-                DataToOnlinePlot["Fart-IIR"] = (Fart_IIR[-1])
+                DataToOnlinePlot["Fart_FIR"] = (Fart_FIR[-1])
+                DataToOnlinePlot["Fart_IIR"] = (Fart_IIR[-1])
                 
 
                 # sender over data
@@ -348,7 +349,7 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(t,l,ts,d,d_FIR,d_IIR,v,v_FIR,v_IIR,k):
+def MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,k):
 
     # Parametre
     alpha = 0.5     # MÅ VÆRE MELLOM 0 og 1  !!!
@@ -358,29 +359,29 @@ def MathCalculations(t,l,ts,d,d_FIR,d_IIR,v,v_FIR,v_IIR,k):
     # Initialverdibereging
 
     if len(t) == 0:
-        ts.append(0)
-        t.append(0)
+        Tid.append(0)
+        Ts.append(0)
 
-        d.append(l[0])
-        d_FIR.append(l[0])
-        d_IIR.append(l[0])
+        MåltAvstand.append([Lys[0]])
+        Avstand_FIR.append([Lys[0]])
+        Avstand_IIR.append([Lys[0]])
 
-        v.append(0)
-        v_FIR.append(0)
-        v_IIR.append(0)
+        Fart.append(0)
+        Fart_FIR.append(0)
+        Fart_IIR.append(0)
     else:
-        ts.appdend(t[-1]-t[-2])  
-        d.append(l)
+        Ts.appdend(t[-1]-t[-2])  
+        MåltAvstand.append(-l)
 
 
     
         # Matematiske beregninger 
-        d_FIR.append(FIR_filter(d,k,m))
-        d_IIR.append(IIR_filter(d,k,d_IIR,alpha))
+        Avstand_FIR.append(FIR_filter(MåltAvstand,k,m))
+        Avstand_IIR.append(IIR_filter(MåltAvstand,k,Avstand_IIR,alpha))
 
-        v.append(Derivasjon(d,ts))
-        v_FIR.append(Derivasjon(d_FIR,ts))
-        v_IIR.append(Derivasjon(d_IIR,ts))
+        Fart.append(Derivasjon(MåltAvstand,Ts))
+        Fart_FIR.append(Derivasjon(Avstand_FIR,Ts))
+        Fart_IIR.append(Derivasjon(Avstand_IIR,Ts))
     # Pådragsberegning
     
 
