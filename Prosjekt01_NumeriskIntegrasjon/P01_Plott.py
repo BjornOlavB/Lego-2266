@@ -28,7 +28,7 @@ EV3_IP = "169.254.224.208"
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P01_NumeriskIntegrasjon-Sinus-3.txt"
+filenameMeas = "Meas_P01_NumeriskIntegrasjon-Sinus-chirp.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
@@ -186,6 +186,8 @@ def figureTitles():
 
     ax[0].set_xlabel('Tid [sec]')
     ax[1].set_xlabel('Tid [sec]')
+
+
 
 
 # Vær obs på at ALLE delfigurene må inneholde data. 
