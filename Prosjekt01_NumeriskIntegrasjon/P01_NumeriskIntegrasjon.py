@@ -41,13 +41,13 @@ import sys
 wired = True
 
 # --> Filnavn for lagring av MÅLINGER som gjøres online
-filenameMeas = "Meas_P01_NumeriskIntegrasjon.txt"
+filenameMeas = "Sin_Meas_P01_NumeriskIntegrasjon.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres online
 #     Typisk navn:  "CalcOnline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå 
 #     filenameCalcOnline = ".txt"
-filenameCalcOnline = "CalcOnline_P01_NumeriskIntegrasjon.txt"
+filenameCalcOnline = "Sin_CalcOnline_P01_NumeriskIntegrasjon.txt"
 # --------------------------------------------------------------------
 
 
