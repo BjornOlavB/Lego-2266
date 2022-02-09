@@ -69,7 +69,7 @@ def main():
         robot = Initialize(wired,filenameMeas,filenameCalcOnline)
 
         # oppdater portnummer
-        myColorSensor = ColorSensor(Port.SX)
+        myColorSensor = ColorSensor(Port.S1)
        
 
         # Sjekker at joystick er tilkoplet EV3 
@@ -339,7 +339,7 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(t, l,ts, T_k, T_fir,T_iir, k):
+def MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR, k):
 
     # Parametre
     alpha = 0.5     # MÅ VÆRE MELLOM 0 og 1  !!!
@@ -348,18 +348,19 @@ def MathCalculations(t, l,ts, T_k, T_fir,T_iir, k):
 
     # Initialverdibereging
 
-    if len(t) == 0:
-        ts.append(0)
-        t.append(0)
-        T_fir.append(T_k)
-        T_iir.append(T_k)
+    if len(Tid) == 0:
+        Ts.append(0)
+        Tid.append(0)
+        TempKaffe.append(Lys[0])
+        TempFilterFIR.append(TempKaffe[0])
+        TempFilterIIR.append(TempKaffe[0])
     else:
-        ts.appdend(t[-1]-t[-2])  
-        T_k.append(l)
+        Ts.appdend(Tid[-1]-Tid[-2])  
+        TempKaffe.append(-1)
     
         # Matematiske beregninger 
-        T_fir.appdend(FIR_filter(T_k, k,m))
-        T_iir.append(IIR_filter(T_k,k,T_iir,alpha))
+        TempFilterFIR.appdend(FIR_filter(TempKaffe, k,m))
+        TempFilterIIR.append(IIR_filter(TempKaffe,k,TempFilterIIR,alpha))
     # Pådragsberegning
     
 
