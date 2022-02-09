@@ -21,7 +21,7 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.123.25"
+EV3_IP = "169.254.78.65"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
@@ -170,6 +170,7 @@ def unpackData(rowOfData):
 
     # egne variable
     Ts.append(rowOfData["Ts"])
+    MåltAvstand.append(rowOfData["MåltAvstand"])
     Avstand_FIR.append(rowOfData["Avstand_FIR"])
     Avstand_IIR.append(rowOfData["Avstand_IIR"])
     Fart.append(rowOfData["Fart"])
@@ -195,15 +196,15 @@ fig, ax = plt.subplots(nrows=3, ncols=1, sharex=True)
 # Repeter om nødvendig noen delfigurer for å fylle ut.
 def figureTitles():
     global ax
-    ax[0,0].set_title('Lys')
-    ax[1,0].set_title('Avstand_FIR&IIR')
-    ax[2,0].set_title('Fart')
+    ax[0].set_title('Lys')
+    ax[1].set_title('Avstand_FIR & IIR')
+    ax[2].set_title('Fart')
 
     # Vær obs på at ALLE delfigurene må inneholde data. 
 
-    ax[1,0].set_xlabel('Tid [sec]')
-    ax[2,0].set_xlabel('Tid [sec]')
-    ax[3,0].set_xlabel('Tid [sec]')
+    ax[0].set_xlabel('Tid [sec]')
+    ax[1].set_xlabel('Tid [sec]')
+    ax[2].set_xlabel('Tid [sec]')
 
     ax[0].set_ylabel('m [meter]')
     ax[1].set_ylabel('m/s')
@@ -213,12 +214,12 @@ def figureTitles():
 # Vær obs på at ALLE delfigurene må inneholde data. 
 # Repeter om nødvendig noen delfigurer for å fylle ut.
 def plotData():
-    ax[0,0].plot(Tid[0:], Lys[0:], 'b')
-    ax[1,0].plot(Tid[0:], Avstand_FIR[0:], 'b')
-    ax[1,0].plot(Tid[0:], Avstand_IIR[0:], 'b')
-    ax[2,0].plot(Tid[0:], Fart[0:], 'b')
-    ax[2,0].plot(Tid[0:], Fart_FIR[0:], 'b')
-    ax[2,0].plot(Tid[0:], Fart_IIR[0:], 'b')
+    ax[0].plot(Tid[0:], Lys[0:], 'b')
+    ax[1].plot(Tid[0:], Avstand_FIR[0:], 'r')
+    ax[1].plot(Tid[0:], Avstand_IIR[0:], 'g')
+    ax[2].plot(Tid[0:], Fart[0:], 'b')
+    ax[2].plot(Tid[0:], Fart_FIR[0:], 'r')
+    ax[2].plot(Tid[0:], Fart_IIR[0:], 'g')
     
 #---------------------------------------------------------------------
 
@@ -290,8 +291,8 @@ def offline(filenameMeas, filenameCalcOffline):
         if len(filenameCalcOffline)>4:
             with open(filenameCalcOffline, "w") as f:
                 CalculatedToFileHeader = "Tallformatet viser til kolonnenummer:\n"
-                CalculatedToFileHeader += "0=Pos_vs_Hastighet, 1=Forward_vs_Side, \n"
-                CalculatedToFileHeader += "2=summeringAvPowerA, 3=powerA, 4=mellomRegninger \n"
+                CalculatedToFileHeader += "0=Ts, 1=MåltAvstand, 2=AvstandFIR, 3=Avstand_IIR \n"
+                CalculatedToFileHeader += "4=Fart, 3=Fart_FIR, 4=Fart_IIR \n"
                 f.write(CalculatedToFileHeader)
 
                 # Lengde av de MÅLTE listene.
@@ -299,10 +300,12 @@ def offline(filenameMeas, filenameCalcOffline):
                 for i in range(0,len(Tid)):
                     CalculatedToFile = ""
                     CalculatedToFile += str(Ts[i]) + ","
-                    CalculatedToFile += str(PowerA[i]) + ","
-                    CalculatedToFile += str(PowerB[i]) + ","
-                    CalculatedToFile += str(PowerC[i]) + ","
-                    CalculatedToFile += str(PowerD[i]) + "\n"
+                    CalculatedToFile += str(MåltAvstand[i]) + ","
+                    CalculatedToFile += str(Avstand_FIR[i]) + ","
+                    CalculatedToFile += str(Avstand_IIR[i]) + ","
+                    CalculatedToFile += str(Fart[i]) + ","
+                    CalculatedToFile += str(Fart_FIR[i]) + ","
+                    CalculatedToFile += str(Fart_IIR[i]) + "\n"
                     f.write(CalculatedToFile)
         #---------------------------------------------------------
 
