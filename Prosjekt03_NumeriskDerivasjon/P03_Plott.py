@@ -9,7 +9,7 @@ try:
     #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # ----> Husk å oppdatere denne !!!!!!!!!!!!!!
     #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    from P01_NumeriskIntegrasjon import MathCalculations
+    from P03_NumeriskDerivasjon import MathCalculations
 except Exception as e:
     pass
     # print(e)
@@ -18,31 +18,23 @@ except Exception as e:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = False
+online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-<<<<<<< HEAD
-EV3_IP = "169.254.123.10"
-=======
-EV3_IP = "169.254.224.208"
->>>>>>> 3ec331235ce16d4da7c501e20991d10164b24124
+EV3_IP = "169.254.123.25"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-<<<<<<< HEAD
-filenameMeas = ""
-=======
-filenameMeas = "Meas_P01_NumeriskIntegrasjon-Sinus-3.txt"
->>>>>>> 3ec331235ce16d4da7c501e20991d10164b24124
+filenameMeas = "Meas_P03_NumeriskDerivasjon.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå 
 #     filenameCalcOffline = ".txt"
-filenameCalcOffline = "CalcOffline_P01_NumeriskIntegrasjon-sinus.txt"
+filenameCalcOffline = "CalcOffline_P03_NumeriskDerivasjon.txt"
 #---------------------------------------------------------------------
 
 
@@ -82,10 +74,13 @@ if not online:
     # oversiktlig. Du kan selvfølgelig legge til nye lister med
     # EGNE VARIABLE her i denne seksjonen når du kjører prosjektet
     # offline.
-    
-    Ts = []             # tidsskritt
-    Flow = []
-    Volum = []
+    Ts = []                # tidsskritt
+    MåltAvstand = []     # Målt avstand (rådata)
+    Avstand_FIR = []     # Filter-FIR Avstand
+    Avstand_IIR = []     # Filter-IIR Avstand
+    Fart = []            # Fart Derivert med rådata (ingen filter)
+    Fart_FIR = []        # Fart Derivert med FIR filter
+    Fart_IIR = []        # Fart Derivert med IIR filter
     
     print("C) offline: OWN VARIABLES. LISTS INITIALIZED.")
     #---------------------------------------------------------------------
@@ -112,10 +107,15 @@ else:
     Tid = []
     Lys = []
     
+    
     # egne variable
-    Ts = []
-    Flow = []
-    Volum = []
+    Ts = []                # tidsskritt
+    MåltAvstand = []     # Målt avstand (rådata)
+    Avstand_FIR = []     # Filter-FIR Avstand
+    Avstand_IIR = []     # Filter-IIR Avstand
+    Fart = []            # Fart Derivert med rådata (ingen filter)
+    Fart_FIR = []        # Fart Derivert med FIR filter
+    Fart_IIR = []        # Fart Derivert med IIR filter
     
     print("D) online: LISTS FOR DATA TO PLOT INITIALIZED.")
     #---------------------------------------------------------------------
@@ -141,6 +141,10 @@ def unpackMeasurement(rowOfMeasurement):
     Tid.append(float(rowOfMeasurement[0]))
     Lys.append(int(rowOfMeasurement[1]))
     
+    # i malen her mangler mange målinger, fyll ut selv det du trenger
+        
+    
+    
     
     # i malen her mangler mange målinger, fyll ut selv det du trenger
 
@@ -163,11 +167,15 @@ def unpackData(rowOfData):
     Tid.append(rowOfData["Tid"])
     Lys.append(rowOfData["Lys"])
     
+
     # egne variable
     Ts.append(rowOfData["Ts"])
-    Flow.append(rowOfData["Flow"])
-    Volum.append(rowOfData["Volum"])
-    
+    Avstand_FIR.append(rowOfData["Avstand_FIR"])
+    Avstand_IIR.append(rowOfData["Avstand_IIR"])
+    Fart.append(rowOfData["Fart"])
+    Fart_FIR.append(rowOfData["Fart_FIR"])
+    Fart_IIR.append(rowOfData["Fart_IIR"])
+
                 
 #-------------------------------------------------------------
 
@@ -181,27 +189,37 @@ def unpackData(rowOfData):
 # eller ncols = 1, så gis ax 1 argument som ax[0], ax[1], osv.
 # Dersom både nrows > 1 og ncols > 1,  så må ax gis 2 argumenter 
 # som ax[0,0], ax[1,0], osv
-fig, ax = plt.subplots(nrows=2, ncols=1, sharex=True)
+fig, ax = plt.subplots(nrows=3, ncols=1, sharex=True)
 
 # Vær obs på at ALLE delfigurene må inneholde data. 
 # Repeter om nødvendig noen delfigurer for å fylle ut.
 def figureTitles():
     global ax
-    ax[0].set_title('Flow')
-    ax[1].set_title('Volum')
-   
+    ax[0,0].set_title('Lys')
+    ax[1,0].set_title('Avstand_FIR&IIR')
+    ax[2,0].set_title('Fart')
+
     # Vær obs på at ALLE delfigurene må inneholde data. 
 
-    ax[0].set_xlabel('Tid [sec]')
-    ax[1].set_xlabel('Tid [sec]')
+    ax[1,0].set_xlabel('Tid [sec]')
+    ax[2,0].set_xlabel('Tid [sec]')
+    ax[3,0].set_xlabel('Tid [sec]')
+
+    ax[0].set_ylabel('m [meter]')
+    ax[1].set_ylabel('m/s')
+    ax[2].set_ylabel('m/s]')
 
 
 # Vær obs på at ALLE delfigurene må inneholde data. 
 # Repeter om nødvendig noen delfigurer for å fylle ut.
 def plotData():
-    ax[0].plot(Tid[0:], Flow[0:], 'b')
-    ax[1].plot(Tid[0:], Volum[0:], 'b')
-   
+    ax[0,0].plot(Tid[0:], Lys[0:], 'b')
+    ax[1,0].plot(Tid[0:], Avstand_FIR[0:], 'b')
+    ax[1,0].plot(Tid[0:], Avstand_IIR[0:], 'b')
+    ax[2,0].plot(Tid[0:], Fart[0:], 'b')
+    ax[2,0].plot(Tid[0:], Fart_FIR[0:], 'b')
+    ax[2,0].plot(Tid[0:], Fart_IIR[0:], 'b')
+    
 #---------------------------------------------------------------------
 
 
@@ -219,10 +237,13 @@ def offline(filenameMeas, filenameCalcOffline):
         # Leser inn målingene fra fil inn i MeasurementFromFile.
         # Fjerner de 4 første linjene som er reservert til header.
         MeasurementFromFile = f.readlines()[4:]
-                        
+        k = 0
+        # K som teller index (hopefully)
+         
         # Går inn i "løkke"
         for EachRow in MeasurementFromFile:
             # Pakk ut målingene 
+            
             rowOfMeasurement = EachRow.split(",")
             unpackMeasurement(rowOfMeasurement)
             
@@ -244,7 +265,9 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys, Volum, Ts, Flow)
+            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,k)
+
+            k += 1
             #---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
@@ -267,8 +290,8 @@ def offline(filenameMeas, filenameCalcOffline):
         if len(filenameCalcOffline)>4:
             with open(filenameCalcOffline, "w") as f:
                 CalculatedToFileHeader = "Tallformatet viser til kolonnenummer:\n"
-                CalculatedToFileHeader += "0=Ts, 1=Flow, 2=Volum\n"
-                CalculatedToFileHeader += " \n"
+                CalculatedToFileHeader += "0=Pos_vs_Hastighet, 1=Forward_vs_Side, \n"
+                CalculatedToFileHeader += "2=summeringAvPowerA, 3=powerA, 4=mellomRegninger \n"
                 f.write(CalculatedToFileHeader)
 
                 # Lengde av de MÅLTE listene.
@@ -276,8 +299,10 @@ def offline(filenameMeas, filenameCalcOffline):
                 for i in range(0,len(Tid)):
                     CalculatedToFile = ""
                     CalculatedToFile += str(Ts[i]) + ","
-                    CalculatedToFile += str(Flow[i]) + ","
-                    CalculatedToFile += str(Volum[i]) + "\n"
+                    CalculatedToFile += str(PowerA[i]) + ","
+                    CalculatedToFile += str(PowerB[i]) + ","
+                    CalculatedToFile += str(PowerC[i]) + ","
+                    CalculatedToFile += str(PowerD[i]) + "\n"
                     f.write(CalculatedToFile)
         #---------------------------------------------------------
 
