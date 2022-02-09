@@ -18,7 +18,7 @@ except Exception as e:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = True
+online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
 EV3_IP = "169.254.78.65"
@@ -28,7 +28,7 @@ EV3_IP = "169.254.78.65"
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P02_Filtrering.txt"
+filenameMeas = "Meas_P02_Filtrering_1.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
@@ -135,10 +135,7 @@ def unpackMeasurement(rowOfMeasurement):
     Tid.append(float(rowOfMeasurement[0]))
     Lys.append(int(rowOfMeasurement[1]))
 
-    TempKaffe.append(int(rowOfMeasurement[2]))
-    TempFilterFIR.append(int(rowOfMeasurement[3]))
-    TempFilterIIR.append(int(rowOfMeasurement[4]))
-    Ts.append(int(rowOfMeasurement[5]))
+   
     
     # i malen her mangler mange målinger, fyll ut selv det du trenger
         
@@ -186,29 +183,27 @@ def unpackData(rowOfData):
 # eller ncols = 1, så gis ax 1 argument som ax[0], ax[1], osv.
 # Dersom både nrows > 1 og ncols > 1,  så må ax gis 2 argumenter 
 # som ax[0,0], ax[1,0], osv
-fig, ax = plt.subplots(nrows=2, ncols=2, sharex=True)
+fig, ax = plt.subplots(nrows=1, ncols=1, sharex=True)
 
 # Vær obs på at ALLE delfigurene må inneholde data. 
 # Repeter om nødvendig noen delfigurer for å fylle ut.
 def figureTitles():
     global ax
-    ax[0,0].set_title('Lys')
-    ax[0,1].set_title('Kaffe')
-    ax[1,0].set_title('FIR')
-    ax[1,1].set_title('IIR')
+    ax.set_title(f'Eksperiment utført ved gjennomsnittlig T_s: {sum(Ts)/len(Ts):,.4f}')
+    
     # Vær obs på at ALLE delfigurene må inneholde data. 
 
-    ax[1,0].set_xlabel('Tid [sec]')
-    ax[1,1].set_xlabel('Tid [sec]')
-
+    ax.set_xlabel('Tid [sec]')
+    ax.set_ylabel('Temperatur [C]')
+    ax.grid()
+    
 
 # Vær obs på at ALLE delfigurene må inneholde data. 
 # Repeter om nødvendig noen delfigurer for å fylle ut.
 def plotData():
-    ax[0,0].plot(Tid[0:], Lys[0:], 'b')
-    ax[0,1].plot(Tid[0:], TempKaffe[0:], 'b')
-    ax[1,0].plot(Tid[0:], TempFilterFIR[0:], 'b')
-    ax[1,1].plot(Tid[0:], TempFilterIIR[0:], 'b')
+    ax.plot(Tid[0:], TempKaffe[0:], 'b', Tid[0:], TempFilterFIR[0:], 'r', Tid[0:], TempFilterIIR[0:], 'g')
+    ax.legend(['KaffeTemp', 'FIR','IIR'])
+    
 #---------------------------------------------------------------------
 
 
@@ -279,8 +274,8 @@ def offline(filenameMeas, filenameCalcOffline):
         if len(filenameCalcOffline)>4:
             with open(filenameCalcOffline, "w") as f:
                 CalculatedToFileHeader = "Tallformatet viser til kolonnenummer:\n"
-                CalculatedToFileHeader += "0=Pos_vs_Hastighet, 1=Forward_vs_Side, \n"
-                CalculatedToFileHeader += "2=summeringAvPowerA, 3=powerA, 4=mellomRegninger \n"
+                CalculatedToFileHeader += "0=Ts, 1=TempKaffe, \n"
+                CalculatedToFileHeader += "2=TempFilterFIR, 3=TempFilterIIR \n"
                 f.write(CalculatedToFileHeader)
 
                 # Lengde av de MÅLTE listene.
@@ -288,10 +283,9 @@ def offline(filenameMeas, filenameCalcOffline):
                 for i in range(0,len(Tid)):
                     CalculatedToFile = ""
                     CalculatedToFile += str(Ts[i]) + ","
-                    CalculatedToFile += str(PowerA[i]) + ","
-                    CalculatedToFile += str(PowerB[i]) + ","
-                    CalculatedToFile += str(PowerC[i]) + ","
-                    CalculatedToFile += str(PowerD[i]) + "\n"
+                    CalculatedToFile += str(TempKaffe[i]) + ","
+                    CalculatedToFile += str(TempFilterFIR[i]) + ","
+                    CalculatedToFile += str(TempFilterIIR[i]) + "\n"
                     f.write(CalculatedToFile)
         #---------------------------------------------------------
 
