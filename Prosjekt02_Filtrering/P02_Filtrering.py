@@ -26,7 +26,7 @@ try:
     import styrestikke.config
 except Exception as e:
     pass  # for å kunne eksportere funksjoner
-
+import random
 import math
 import struct
 import socket
