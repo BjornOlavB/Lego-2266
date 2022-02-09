@@ -344,7 +344,7 @@ def MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR, k):
 
     # Parametre
     alpha = 0.5     # MÅ VÆRE MELLOM 0 og 1  !!!
-    m = k           # m-Siste målinger 
+    m = 10           # m-Siste målinger 
                     #OBS! ----- Sett m = k i online
 
     # Initialverdibereging
@@ -375,13 +375,13 @@ def FIR_filter(list,index,m):
     if len(list) < m:
         m = len(list)                             # sjekker at m ikke er større en k
                        
-    FIR_Value = (1/m)*(sum(list[index-n:]))       # Glatting av målinger i FIR filter
+    FIR_Value = (1/m)*(sum(list[-m:]))       # Glatting av målinger i FIR filter
     return FIR_Value                              # Retunering av utregnet verdi
 
 def IIR_filter(list,index,IIR_prev,alpha):
 
-        IIR_Value = alpha*list[index]+(1-alpha)*IIR_prev[index-1]
-        return IIR_Value
+    IIR_Value = alpha*list[index]+(1-alpha)*IIR_prev[index-1]
+    return IIR_Value
 
 
 if __name__ == '__main__':

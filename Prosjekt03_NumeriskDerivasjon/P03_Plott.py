@@ -21,7 +21,7 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.78.65"
+EV3_IP = "169.254.114.2"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
@@ -116,6 +116,7 @@ else:
     Fart = []            # Fart Derivert med rådata (ingen filter)
     Fart_FIR = []        # Fart Derivert med FIR filter
     Fart_IIR = []        # Fart Derivert med IIR filter
+    Akselerasjon = []
     
     print("D) online: LISTS FOR DATA TO PLOT INITIALIZED.")
     #---------------------------------------------------------------------
@@ -176,6 +177,7 @@ def unpackData(rowOfData):
     Fart.append(rowOfData["Fart"])
     Fart_FIR.append(rowOfData["Fart_FIR"])
     Fart_IIR.append(rowOfData["Fart_IIR"])
+    Akselerasjon.append(rowOfData["Akselerasjon"])
 
                 
 #-------------------------------------------------------------
@@ -190,7 +192,7 @@ def unpackData(rowOfData):
 # eller ncols = 1, så gis ax 1 argument som ax[0], ax[1], osv.
 # Dersom både nrows > 1 og ncols > 1,  så må ax gis 2 argumenter 
 # som ax[0,0], ax[1,0], osv
-fig, ax = plt.subplots(nrows=3, ncols=1, sharex=True)
+fig, ax = plt.subplots(nrows=4, ncols=1, sharex=True)
 
 # Vær obs på at ALLE delfigurene må inneholde data. 
 # Repeter om nødvendig noen delfigurer for å fylle ut.
@@ -199,6 +201,7 @@ def figureTitles():
     ax[0].set_title('Lys')
     ax[1].set_title('Avstand_FIR & IIR')
     ax[2].set_title('Fart')
+    ax[3].set_title('Akselerasjon')
 
     # Vær obs på at ALLE delfigurene må inneholde data. 
 
@@ -220,6 +223,8 @@ def plotData():
     ax[2].plot(Tid[0:], Fart[0:], 'b')
     ax[2].plot(Tid[0:], Fart_FIR[0:], 'r')
     ax[2].plot(Tid[0:], Fart_IIR[0:], 'g')
+    ax[3].plot(Tid[0:], Akselerasjon[0:], 'g')
+
     
 #---------------------------------------------------------------------
 
@@ -266,7 +271,7 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,k)
+            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon,k)
 
             k += 1
             #---------------------------------------------------------
@@ -292,7 +297,7 @@ def offline(filenameMeas, filenameCalcOffline):
             with open(filenameCalcOffline, "w") as f:
                 CalculatedToFileHeader = "Tallformatet viser til kolonnenummer:\n"
                 CalculatedToFileHeader += "0=Ts, 1=MåltAvstand, 2=AvstandFIR, 3=Avstand_IIR \n"
-                CalculatedToFileHeader += "4=Fart, 3=Fart_FIR, 4=Fart_IIR \n"
+                CalculatedToFileHeader += "4=Fart, 3=Fart_FIR, 4=Fart_IIR, 5=Akselerasjon \n"
                 f.write(CalculatedToFileHeader)
 
                 # Lengde av de MÅLTE listene.
@@ -305,7 +310,8 @@ def offline(filenameMeas, filenameCalcOffline):
                     CalculatedToFile += str(Avstand_IIR[i]) + ","
                     CalculatedToFile += str(Fart[i]) + ","
                     CalculatedToFile += str(Fart_FIR[i]) + ","
-                    CalculatedToFile += str(Fart_IIR[i]) + "\n"
+                    CalculatedToFile += str(Fart_IIR[i]) + ","
+                    CalculatedToFile += str(Akselerasjon[i]) + "\n"
                     f.write(CalculatedToFile)
         #---------------------------------------------------------
 

@@ -134,6 +134,7 @@ def main():
         Fart = []            # Fart Derivert med rådata (ingen filter)
         Fart_FIR = []        # Fart Derivert med FIR filter
         Fart_IIR = []        # Fart Derivert med IIR filter
+        Akselerasjon = []
         
 
         print("4) OWN VARIABLES. LISTS INITIALIZED.")
@@ -210,7 +211,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene. 
             
-            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,k)
+            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon,k)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -238,7 +239,7 @@ def main():
                 if k == 0:
                     CalculationsToFileHeader = "Tallformatet viser til kolonnenummer:\n"
                     CalculationsToFileHeader += "0=Ts, 1=Avstand_FIR, 2=Avstand_IIR, \n"
-                    CalculationsToFileHeader += "3=Fart, 4=Fart_FIR, 5=Fart_IIR,\n"
+                    CalculationsToFileHeader += "3=Fart, 4=Fart_FIR, 5=Fart_IIR, 7= Akselerasjon,\n"
                     robot["calculations"].write(CalculationsToFileHeader)
                 CalculationsToFile = ""
                 CalculationsToFile += str(Ts[-1]) + ","
@@ -246,7 +247,8 @@ def main():
                 CalculationsToFile += str(Avstand_IIR[-1]) + ","
                 CalculationsToFile += str(Fart[-1]) + ","
                 CalculationsToFile += str(Fart_FIR[-1]) + ","
-                CalculationsToFile += str(Fart_IIR[-1]) + "\n"
+                CalculationsToFile += str(Fart_IIR[-1]) + ","
+                CalculationsToFile += str(Akselerasjon[-1]) + "\n"
 
                 # Skriv CalcultedToFile til .txt-filen navngitt i seksjon 1)
                 robot["calculations"].write(CalculationsToFile)
@@ -287,6 +289,7 @@ def main():
                 DataToOnlinePlot["Fart"] = (Fart[-1])
                 DataToOnlinePlot["Fart_FIR"] = (Fart_FIR[-1])
                 DataToOnlinePlot["Fart_IIR"] = (Fart_IIR[-1])
+                DataToOnlinePlot["Akselerasjon"] = (Akselerasjon[-1])
                 
 
                 # sender over data
@@ -349,29 +352,30 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,k):
+def MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon,k):
 
     # Parametre
-    alpha = 0.5     # MÅ VÆRE MELLOM 0 og 1  !!!
+    alpha = 0.2     # MÅ VÆRE MELLOM 0 og 1  !!!
     m = k           # m-Siste målinger 
                     #OBS! ----- Sett m = k i online
 
     # Initialverdibereging
 
-    if len(t) == 0:
-        Tid.append(0)
-        Ts.append(0)
+    if len(Tid) == 1:
+        
+        Ts.append(Tid[0])
 
-        MåltAvstand.append([Lys[0]])
-        Avstand_FIR.append([Lys[0]])
-        Avstand_IIR.append([Lys[0]])
+        MåltAvstand.append(Lys[0])
+        Avstand_FIR.append(Lys[0])
+        Avstand_IIR.append(Lys[0])
 
         Fart.append(0)
         Fart_FIR.append(0)
         Fart_IIR.append(0)
+        Akselerasjon.append(0)
     else:
-        Ts.appdend(t[-1]-t[-2])  
-        MåltAvstand.append(-l)
+        Ts.append(Tid[-1]-Tid[-2])  
+        MåltAvstand.append(Lys[-1])
 
 
     
@@ -382,6 +386,7 @@ def MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_
         Fart.append(Derivasjon(MåltAvstand,Ts))
         Fart_FIR.append(Derivasjon(Avstand_FIR,Ts))
         Fart_IIR.append(Derivasjon(Avstand_IIR,Ts))
+        Akselerasjon.append(Derivasjon(Fart_IIR,Ts))
     # Pådragsberegning
     
 
@@ -403,11 +408,9 @@ def FIR_filter(list,index,m):
     return FIR_Value                              # Retunering av utregnet verdi
 
 def IIR_filter(list,index,IIR_prev,alpha):
-    if len(list) <= 0:                                          
-        return list [0]
-    else:
-        IIR_Value = alpha*list[index]+(1-alpha)*IIR_prev[index-1]
-        return IIR_Value
+    
+    IIR_Value = alpha*list[index]+(1-alpha)*IIR_prev[index-1]
+    return IIR_Value
 
 
 if __name__ == '__main__':
