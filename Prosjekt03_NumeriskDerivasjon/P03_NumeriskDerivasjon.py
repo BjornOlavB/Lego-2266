@@ -211,7 +211,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene. 
             
-            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon,k)
+            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -352,11 +352,11 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon,k):
+def MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon):
 
     # Parametre
     alpha = 0.2     # MÅ VÆRE MELLOM 0 og 1  !!!
-    m = k           # m-Siste målinger 
+    m = 8           # m-Siste målinger 
                     #OBS! ----- Sett m = k i online
 
     # Initialverdibereging
@@ -380,8 +380,8 @@ def MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_
 
     
         # Matematiske beregninger 
-        Avstand_FIR.append(FIR_filter(MåltAvstand,k,m))
-        Avstand_IIR.append(IIR_filter(MåltAvstand,k,Avstand_IIR,alpha))
+        Avstand_FIR.append(FIR_filter(MåltAvstand,m))
+        Avstand_IIR.append(IIR_filter(MåltAvstand,Avstand_IIR,alpha))
 
         Fart.append(Derivasjon(MåltAvstand,Ts))
         Fart_FIR.append(Derivasjon(Avstand_FIR,Ts))
@@ -398,19 +398,20 @@ def Derivasjon(functionValue,dt):
 
 
 # Funker bedre i offline
-def FIR_filter(list,index,m):
+def FIR_filter(list,m):
                                                     
     n = m-1                                       # For riktig indexering
     if len(list) < m:
         m = len(list)                             # sjekker at m ikke er større en k
                        
-    FIR_Value = (1/m)*(sum(list[index-n:]))       # Glatting av målinger i FIR filter
+    FIR_Value = (1/m)*(sum(list[-m:]))       # Glatting av målinger i FIR filter
     return FIR_Value                              # Retunering av utregnet verdi
 
-def IIR_filter(list,index,IIR_prev,alpha):
-    
-    IIR_Value = alpha*list[index]+(1-alpha)*IIR_prev[index-1]
+def IIR_filter(list,IIR_prev,alpha):
+
+    IIR_Value = alpha*list[-1]+(1-alpha)*IIR_prev[-1]
     return IIR_Value
+
 
 
 if __name__ == '__main__':

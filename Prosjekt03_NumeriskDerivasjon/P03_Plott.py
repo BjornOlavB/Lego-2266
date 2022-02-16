@@ -18,7 +18,7 @@ except Exception as e:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = True
+online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
 EV3_IP = "169.254.114.2"
@@ -28,7 +28,7 @@ EV3_IP = "169.254.114.2"
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P03_NumeriskDerivasjon.txt"
+filenameMeas = "Meas_P03_Linear.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
@@ -81,6 +81,7 @@ if not online:
     Fart = []            # Fart Derivert med rådata (ingen filter)
     Fart_FIR = []        # Fart Derivert med FIR filter
     Fart_IIR = []        # Fart Derivert med IIR filter
+    Akselerasjon = []    # Akselerasjon Derivert fra fart
     
     print("C) offline: OWN VARIABLES. LISTS INITIALIZED.")
     #---------------------------------------------------------------------
@@ -116,7 +117,7 @@ else:
     Fart = []            # Fart Derivert med rådata (ingen filter)
     Fart_FIR = []        # Fart Derivert med FIR filter
     Fart_IIR = []        # Fart Derivert med IIR filter
-    Akselerasjon = []
+    Akselerasjon = []    # Akselerasjon Derivert fra fart
     
     print("D) online: LISTS FOR DATA TO PLOT INITIALIZED.")
     #---------------------------------------------------------------------
@@ -243,7 +244,7 @@ def offline(filenameMeas, filenameCalcOffline):
         # Leser inn målingene fra fil inn i MeasurementFromFile.
         # Fjerner de 4 første linjene som er reservert til header.
         MeasurementFromFile = f.readlines()[4:]
-        k = 0
+        
         # K som teller index (hopefully)
          
         # Går inn i "løkke"
@@ -271,9 +272,9 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon,k)
+            MathCalculations(Tid, Lys,Ts,MåltAvstand,Avstand_FIR,Avstand_IIR,Fart,Fart_FIR,Fart_IIR,Akselerasjon)
 
-            k += 1
+            
             #---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
