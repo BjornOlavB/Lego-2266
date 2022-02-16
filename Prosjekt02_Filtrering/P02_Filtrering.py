@@ -340,11 +340,11 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR, k):
+def MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR):
 
     # Parametre
-    alpha = 0.5     # MÅ VÆRE MELLOM 0 og 1  !!!
-    m = 10           # m-Siste målinger 
+    alpha = 0.1     # MÅ VÆRE MELLOM 0 og 1  !!!
+    m = 20           # m-Siste målinger 
                     #OBS! ----- Sett m = k i online
 
     # Initialverdibereging
@@ -356,11 +356,12 @@ def MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR, k):
         TempFilterIIR.append(TempKaffe[0])
     else:
         Ts.append(Tid[-1]-Tid[-2])  
-        TempKaffe.append(Lys[-1])
+        TempKaffe.append(Lys[-1])                     # Kommenter ut når måletsøy skal brukes
+        #TempKaffe.append(Lys[-1]+random.random()*2)    Kommenter inn for målestøy
     
         # Matematiske beregninger 
-        TempFilterFIR.append(FIR_filter(TempKaffe, k,m))
-        TempFilterIIR.append(IIR_filter(TempKaffe,k,TempFilterIIR,alpha))
+        TempFilterFIR.append(FIR_filter(TempKaffe, m))
+        TempFilterIIR.append(IIR_filter(TempKaffe, TempFilterIIR, alpha))
     # Pådragsberegning
     
 
@@ -369,7 +370,7 @@ def MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR, k):
 
 
 # Funker bedre i offline
-def FIR_filter(list,index,m):
+def FIR_filter(list,m):
                                                     
     n = m-1                                       # For riktig indexering
     if len(list) < m:
@@ -378,9 +379,9 @@ def FIR_filter(list,index,m):
     FIR_Value = (1/m)*(sum(list[-m:]))       # Glatting av målinger i FIR filter
     return FIR_Value                              # Retunering av utregnet verdi
 
-def IIR_filter(list,index,IIR_prev,alpha):
+def IIR_filter(list,IIR_prev,alpha):
 
-    IIR_Value = alpha*list[index]+(1-alpha)*IIR_prev[index-1]
+    IIR_Value = alpha*list[-1]+(1-alpha)*IIR_prev[-1]
     return IIR_Value
 
 
