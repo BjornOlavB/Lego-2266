@@ -28,7 +28,7 @@ EV3_IP = "169.254.78.65"
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P02_Filtrering_1.txt"
+filenameMeas = "Meas_P02_Filtrering_konstant.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
@@ -221,7 +221,7 @@ def offline(filenameMeas, filenameCalcOffline):
         # Leser inn målingene fra fil inn i MeasurementFromFile.
         # Fjerner de 4 første linjene som er reservert til header.
         MeasurementFromFile = f.readlines()[4:]
-        k = 0
+        
         # K som teller index (hopefully)
          
         # Går inn i "løkke"
@@ -249,9 +249,9 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR,k)
+            MathCalculations(Tid, Lys,Ts,TempKaffe,TempFilterFIR,TempFilterIIR)
 
-            k += 1
+            
             #---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
