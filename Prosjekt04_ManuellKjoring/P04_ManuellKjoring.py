@@ -231,6 +231,7 @@ def main():
             motorB.dc(PowerB[-1])
             motorC.dc(PowerC[-1])
 
+
             # --------------------------------------------------------
 
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -362,9 +363,12 @@ def main():
 def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC):
 
     # Parametre
-    a = 0.2                                               #'Gir' for bil
-    b = 0.1
+    a = 0.3                                               #'Gir' for bil
+    b = 0.5
     m = 1
+    # Pådragsberegning
+    PowerB.append(b*joySide[-1] + a*joyForward[-1])
+    PowerC.append(-b*joySide[-1] + a*joyForward[-1])
     # Initialverdibereging
     referanse = Lys[0]   
     if len(Tid) == 1:
@@ -380,13 +384,12 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
         Avvik.append(Lys[-1] - referanse)
         IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
         MAE.append(mean_abs_error(Avvik, m))     
-
+        TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
+        TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
     # Matematiske beregninger
                    #IIR av Lys
 
-    # Pådragsberegning
-    PowerB.append(b*joySide[-1] + a*joyForward[-1])
-    PowerC.append(-b*joySide[-1] + a*joyForward[-1])
+    
                       
 
 # ---------------------------------------------------------------------
@@ -396,9 +399,12 @@ def EulerForward(functionValue, Ts, intValueOld):
     intValueNew = intValueOld + Ts*functionValue
     return abs(intValueNew)
 
+def TV(functionValue,functionValueOld,TV):
+    return TV[-1] + abs(functionValue-functionValueOld)
+
 
 def mean_abs_error(list, m):
-    n = m-1                                       # For riktig indexering
+                                           # For riktig indexering
     if len(list) < m:
         # sjekker at m ikke er større en k
         m = len(list)
