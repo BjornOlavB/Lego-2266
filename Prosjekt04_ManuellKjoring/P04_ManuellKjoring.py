@@ -26,11 +26,13 @@ try:
     import styrestikke.config
 except Exception as e:
     pass  # for å kunne eksportere funksjoner
+import statistics
 import struct
 import socket
 import json
 import _thread
 import sys
+import math
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #            1) EXPERIMENT SETUP AND FILENAME
@@ -136,6 +138,9 @@ def main():
         TV_C = []           # total variation motor C
         Avvik = []
 
+        medianLys = []
+        STD_Lys = []
+
         print("4) OWN VARIABLES. LISTS INITIALIZED.")
         # ------------------------------------------------------------
 
@@ -224,7 +229,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene.
 
-            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC)
+            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -253,13 +258,22 @@ def main():
             if len(filenameCalcOnline) > 4:
                 if k == 0:
                     CalculationsToFileHeader = "Tallformatet viser til kolonnenummer:\n"
-                    CalculationsToFileHeader += "0=Ts, 1=PowerA, \n"
-                    CalculationsToFileHeader += "2=PowerB, 3=PowerC, 4=PowerD \n"
+                    CalculationsToFileHeader += "0=Ts, 1=PowerB, 2=PowerC, \n"
+                    CalculationsToFileHeader += "3=IAE, 4=MAE \n"
+                    CalculationsToFileHeader += "5=TV_B, 6=TV_C \n"
+                    CalculationsToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys \n"
                     robot["calculations"].write(CalculationsToFileHeader)
                 CalculationsToFile = ""
                 CalculationsToFile += str(Ts[-1]) + ","
                 CalculationsToFile += str(PowerB[-1]) + ","
-                CalculationsToFile += str(PowerC[-1]) + "\n"
+                CalculationsToFile += str(PowerC[-1]) + ","
+                CalculationsToFile += str(IAE[-1]) + ","
+                CalculationsToFile += str(MAE[-1]) + ","
+                CalculationsToFile += str(TV_B[-1]) + ","
+                CalculationsToFile += str(TV_C[-1]) + ","
+                CalculationsToFile += str(Avvik[-1]) + ","
+                CalculationsToFile += str(medianLys[-1]) + ","
+                CalculationsToFile += str(STD_Lys[-1]) + "\n"
 
                 # Skriv CalcultedToFile til .txt-filen navngitt i seksjon 1)
                 robot["calculations"].write(CalculationsToFile)
@@ -301,6 +315,8 @@ def main():
                 DataToOnlinePlot["TV_B"] = (TV_B[-1])
                 DataToOnlinePlot["TV_C"] = (TV_C[-1])
                 DataToOnlinePlot["Avvik"] = (Avvik[-1])
+                DataToOnlinePlot["MedianLys"] = (medianLys[-1])
+                DataToOnlinePlot["STD_Lys"] = (STD_Lys[-1])
 
                 # sender over data
                 msg = json.dumps(DataToOnlinePlot)
@@ -360,11 +376,11 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC):
+def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys):
 
     # Parametre
     a = 0.3                                               #'Gir' for bil
-    b = 0.5
+    b = 0.7
     m = 1
     # Pådragsberegning
     PowerB.append(b*joySide[-1] + a*joyForward[-1])
@@ -378,7 +394,8 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
         TV_B.append(0)                                      #Total Variaton motorB
         TV_C.append(0)
         Avvik.append(0)                                      #Total Variaton motorC
-                                       
+        medianLys.append(0)                               
+        STD_Lys.append(0)
     else:
         Ts.append(Tid[-1]-Tid[-2])
         Avvik.append(Lys[-1] - referanse)
@@ -386,6 +403,8 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
         MAE.append(mean_abs_error(Avvik, m))     
         TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
         TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
+        medianLys.append(median(Lys))
+        STD_Lys.append(STD(Lys[-1],medianLys[-1],STD_Lys))
     # Matematiske beregninger
                    #IIR av Lys
 
@@ -413,6 +432,12 @@ def mean_abs_error(list, m):
     intValueNew = (1/m)*(sum(list[-m:]))
     # Retunering av utregnet verdi FIR VALUE
     return abs(intValueNew)
+
+def median(list):
+    return (sum(list))/len(list)
+
+def STD(list,medianList,std):
+    return math.sqrt((std[-1]+(list-medianList)**2)/(len(std)))
 
 
 if __name__ == '__main__':

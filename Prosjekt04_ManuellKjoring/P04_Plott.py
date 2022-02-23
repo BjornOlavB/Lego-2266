@@ -89,6 +89,8 @@ if not online:
     TV_B = []           # total variation motor B
     TV_C = []           # total variation motor C
     Avvik = []
+    medianLys = []
+    STD_Lys = []
     
     
     print("C) offline: OWN VARIABLES. LISTS INITIALIZED.")
@@ -127,6 +129,8 @@ else:
     TV_B = []           # total variation motor B
     TV_C = []           # total variation motor C
     Avvik = []
+    medianLys = []
+    STD_Lys = []
 
     
     
@@ -195,6 +199,8 @@ def unpackData(rowOfData):
     TV_B.append(rowOfData["TV_B"])          # total variation motor B
     TV_C.append(rowOfData["TV_C"])          # total variation motor C
     Avvik.append(rowOfData["Avvik"])
+    medianLys.append(rowOfData["MedianLys"])
+    STD_Lys.append(rowOfData["STD_Lys"])
 
                 
 #-------------------------------------------------------------
@@ -286,7 +292,7 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC)
+            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys)
             #---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
