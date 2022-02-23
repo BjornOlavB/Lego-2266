@@ -39,13 +39,13 @@ import sys
 wired = True
 
 # --> Filnavn for lagring av MÅLINGER som gjøres online
-filenameMeas = "Meas_P0X_BeskrivendeTekst_Y.txt"
+filenameMeas = "Meas_P04_BeskrivendeTekst_Y.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres online
 #     Typisk navn:  "CalcOnline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå
 #     filenameCalcOnline = ".txt"
-filenameCalcOnline = "CalcOnline_P0X_BeskrivendeTekst_Y.txt"
+filenameCalcOnline = "CalcOnline_P04_BeskrivendeTekst_Y.txt"
 # --------------------------------------------------------------------
 
 
@@ -66,9 +66,7 @@ def main():
 
         # oppdater portnummer
         myColorSensor = ColorSensor(Port.S3)
-        myUltrasonicSensor = UltrasonicSensor(Port.S1)
-        myGyroSensor = GyroSensor(Port.S4)
-
+      
         motorB = Motor(Port.B)
         motorB.reset_angle(0)
         motorC = Motor(Port.C)
@@ -100,34 +98,11 @@ def main():
 
         Tid = []                # registring av tidspunkt for målinger
         Lys = []                # måling av reflektert lys fra ColorSensor
-        Avstand = []            # måling av avstand fra UltrasonicSensor
-        GyroAngle = []          # måling av gyrovinkel fra GyroSensor
-        GyroRate = []           # måling av gyrovinkelfart fra GyroSensor
-
-        VinkelPosMotorB = []    # vinkelposisjon motor B
-        HastighetMotorB = []    # hastighet motor B
-        VinkelPosMotorC = []    # vinkelposisjon motor C
-        HastighetMotorC = []    # hastighet motor C
-
+        
         joyForward = []         # måling av foroverbevegelse styrestikke
         joySide = []            # måling av sidebevegelse styrestikke
-        joyTwist = []           # måling av vribevegelse styrestikke
-        joyPotMeter = []        # måling av potensionmeter styrestikke
-        joyPOVForward = []      # måling av foroverbevegelse toppledd
-        joyPOVSide = []         # måling av sidebevegelse toppledd
-
-        joy1 = []               # måling av knapp 1 (skyteknappen)
-        joy2 = []               # måling av knapp 2 (ved tommel)
-        joy3 = []               # måling av knapp 3
-        joy4 = []               # måling av knapp 4
-        joy5 = []               # måling av knapp 5
-        joy6 = []               # måling av knapp 6
-        joy7 = []               # måling av knapp 7
-        joy8 = []               # måling av knapp 8
-        joy9 = []               # måling av knapp 9
-        joy10 = []              # måling av knapp 10
-        joy11 = []              # måling av knapp 11
-        joy12 = []              # måling av knapp 12
+        
+        
 
         print("3) MEASUREMENTS. LISTS INITIALIZED.")
         # ------------------------------------------------------------
@@ -157,7 +132,8 @@ def main():
         PowerC = []         # berenging av motorpådrag C
         IAE = []            # int av abs. error
         MAE = []            # min abs. error
-        TV = []             # total variation
+        TV_B = []           # total variation motor B
+        TV_C = []           # total variation motor C
         Avvik = []
 
         print("4) OWN VARIABLES. LISTS INITIALIZED.")
@@ -187,34 +163,14 @@ def main():
                 Tid.append(perf_counter() - starttidspunkt)
 
             Lys.append(myColorSensor.reflection())
-            Avstand.append(myUltrasonicSensor.distance())
-            GyroAngle.append(myGyroSensor.angle())
-            GyroRate.append(myGyroSensor.speed())
-
-            VinkelPosMotorB.append(motorB.angle())
-            HastighetMotorB.append(motorB.speed())
-            VinkelPosMotorC.append(motorC.angle())
-            HastighetMotorC.append(motorC.speed())
-
+           
+            
             joyForward.append(config.joyForwardInstance)
             joySide.append(config.joySideInstance)
-            joyTwist.append(config.joyTwistInstance)
-            joyPotMeter.append(config.joyPotMeterInstance)
-            joyPOVForward.append(config.joyPOVForwardInstance)
-            joyPOVSide.append(config.joyPOVSideInstance)
+           
+        
 
-            joy1.append(config.joy1Instance)
-            joy2.append(config.joy2Instance)
-            joy3.append(config.joy3Instance)
-            joy4.append(config.joy4Instance)
-            joy5.append(config.joy5Instance)
-            joy6.append(config.joy6Instance)
-            joy7.append(config.joy7Instance)
-            joy8.append(config.joy8Instance)
-            joy9.append(config.joy9Instance)
-            joy10.append(config.joy10Instance)
-            joy11.append(config.joy11Instance)
-            joy12.append(config.joy12Instance)
+            
             # --------------------------------------------------------
 
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -245,36 +201,13 @@ def main():
             MeasurementToFile = ""
             MeasurementToFile += str(Tid[-1]) + ","
             MeasurementToFile += str(Lys[-1]) + ","
-            MeasurementToFile += str(LysDirekte[-1]) + ","
-            MeasurementToFile += str(Bryter[-1]) + ","
-            MeasurementToFile += str(Avstand[-1]) + ","
-            MeasurementToFile += str(GyroAngle[-1]) + ","
-            MeasurementToFile += str(GyroRate[-1]) + ","
-
-            MeasurementToFile += str(VinkelPosMotorB[-1]) + ","
-            MeasurementToFile += str(HastighetMotorB[-1]) + ","
-            MeasurementToFile += str(VinkelPosMotorC[-1]) + ","
-            MeasurementToFile += str(HastighetMotorC[-1]) + ","
-
+          
+    
             MeasurementToFile += str(joyForward[-1]) + ","
-            MeasurementToFile += str(joySide[-1]) + ","
-            MeasurementToFile += str(joyTwist[-1]) + ","
-            MeasurementToFile += str(joyPotMeter[-1]) + ","
-            MeasurementToFile += str(joyPOVForward[-1]) + ","
-            MeasurementToFile += str(joyPOVSide[-1]) + ","
+            MeasurementToFile += str(joySide[-1]) + "\n"
+            
 
-            MeasurementToFile += str(joy1[-1]) + ","
-            MeasurementToFile += str(joy2[-1]) + ","
-            MeasurementToFile += str(joy3[-1]) + ","
-            MeasurementToFile += str(joy4[-1]) + ","
-            MeasurementToFile += str(joy5[-1]) + ","
-            MeasurementToFile += str(joy6[-1]) + ","
-            MeasurementToFile += str(joy7[-1]) + ","
-            MeasurementToFile += str(joy8[-1]) + ","
-            MeasurementToFile += str(joy9[-1]) + ","
-            MeasurementToFile += str(joy10[-1]) + ","
-            MeasurementToFile += str(joy11[-1]) + ","
-            MeasurementToFile += str(joy12[-1]) + "\n"
+            
 
             # Skriv MeasurementToFile til .txt-filen navngitt øverst
             robot["measurements"].write(MeasurementToFile)
@@ -291,7 +224,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene.
 
-            MathCalculations(.......)
+            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -356,11 +289,17 @@ def main():
                 DataToOnlinePlot["Tid"] = (Tid[-1])
                 DataToOnlinePlot["Lys"] = (Lys[-1])
                 DataToOnlinePlot["joyForward"] = (joyForward[-1])
+                DataToOnlinePlot["joySide"] = (joySide[-1])
 
                 # egne variable
                 DataToOnlinePlot["Ts"] = (Ts[-1])
                 DataToOnlinePlot["PowerB"] = (PowerB[-1])
                 DataToOnlinePlot["PowerC"] = (PowerC[-1])
+                DataToOnlinePlot["IAE"] = (IAE[-1])
+                DataToOnlinePlot["MAE"] = (MAE[-1])
+                DataToOnlinePlot["TV_B"] = (TV_B[-1])
+                DataToOnlinePlot["TV_C"] = (TV_C[-1])
+                DataToOnlinePlot["Avvik"] = (Avvik[-1])
 
                 # sender over data
                 msg = json.dumps(DataToOnlinePlot)
@@ -396,6 +335,7 @@ def main():
         # - hold() bråstopper umiddelbart og holder posisjonen
         motorB.brake()
         motorC.brake()
+        
 
         # Lukker forbindelsen til både styrestikke og EV3.
         CloseJoystickAndEV3(robot, wired)
@@ -419,32 +359,41 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MEA, TV, k):
+def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC):
 
     # Parametre
-    m = k
+    a = 0.2                                               #'Gir' for bil
+    b = 0.1
+    m = 1
     # Initialverdibereging
+    referanse = Lys[0]   
     if len(Tid) == 1:
-        Ts.append(0)
-        IAE.append(0)
-        MEA.append(0)
-        TV.append(0)
-        referanse = Lys[0]
+        Ts.append(0)                                        #Tidsskritt
+        IAE.append(0)                                       #Integral of Absolute Error
+        MAE.append(0)                                       #Mean Absoute Error
+        TV_B.append(0)                                      #Total Variaton motorB
+        TV_C.append(0)
+        Avvik.append(0)                                      #Total Variaton motorC
+                                       
     else:
         Ts.append(Tid[-1]-Tid[-2])
         Avvik.append(Lys[-1] - referanse)
+        IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
+        MAE.append(mean_abs_error(Avvik, m))     
 
     # Matematiske beregninger
-    IAE.append(EulerForward(Avvik, Ts, IAE))
+                   #IIR av Lys
 
     # Pådragsberegning
-    MEA.append(mean_abs_error(Avvik, m))
+    PowerB.append(b*joySide[-1] + a*joyForward[-1])
+    PowerC.append(-b*joySide[-1] + a*joyForward[-1])
+                      
 
 # ---------------------------------------------------------------------
 
 
 def EulerForward(functionValue, Ts, intValueOld):
-    intValueNew = intValueOld[-1] + Ts[-1]*functionValue[-1]
+    intValueNew = intValueOld + Ts*functionValue
     return abs(intValueNew)
 
 
