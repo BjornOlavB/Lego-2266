@@ -376,7 +376,7 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys):
+def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,middleLys,STD_Lys):
 
     # Parametre
     a = 0.3                                               #'Gir' for bil
@@ -394,7 +394,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
         TV_B.append(0)                                      #Total Variaton motorB
         TV_C.append(0)
         Avvik.append(0)                                      #Total Variaton motorC
-        medianLys.append(0)                               
+        middleLys.append(0)                               
         STD_Lys.append(0)
     else:
         Ts.append(Tid[-1]-Tid[-2])
@@ -405,8 +405,8 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
         TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
         TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
 
-        medianLys.append(median(Lys))
-        STD_Lys.append(STD(Lys[-1],medianLys[-1],STD_Lys))
+        middleLys.append(middleValue(Lys))
+        STD_Lys.append(STD(Lys[-1],referanse,STD_Lys))
     # Matematiske beregninger
                    #IIR av Lys
 
@@ -435,7 +435,7 @@ def mean_abs_error(list, m):
     # Retunering av utregnet verdi FIR VALUE
     return abs(intValueNew)
 
-def median(list):
+def middleValue(list):
     return (sum(list))/len(list)
 
 def STD(list,medianList,std):

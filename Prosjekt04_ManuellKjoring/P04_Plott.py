@@ -252,7 +252,7 @@ def plotData():
     ax[2,1].plot(Tid[0:], MAE[0:], 'b')
 
 def plotHist():
-    ax2.hist(Avvik,edgecolor="black",color="g",bins=100,orientation="horizontal")
+    ax2.hist(STD_Lys,edgecolor="black",color="g",align="left")
     
 #---------------------------------------------------------------------
 
