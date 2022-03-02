@@ -18,23 +18,23 @@ except Exception as e:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = True
+online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.15.56"
+EV3_IP = "169.254.203.176"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P04_BeskrivendeTekst_Y.txt"
+filenameMeas = "Meas_P04_ManuellKjøring.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå 
 #     filenameCalcOffline = ".txt"
-filenameCalcOffline = "CalcOffline_P04_BeskrivendeTekst_Y.txt"
+filenameCalcOffline = "CalcOffline_P04_ManuellKjøring.txt"
 #---------------------------------------------------------------------
 
 
@@ -156,7 +156,7 @@ else:
 # Det er viktig å spesifisere riktig datatype og kolonne.
 def unpackMeasurement(rowOfMeasurement):
     Tid.append(float(rowOfMeasurement[0]))
-    Lys.append(int(rowOfMeasurement[1]))
+    Lys.append(float(rowOfMeasurement[1]))
     
 
     
@@ -164,7 +164,7 @@ def unpackMeasurement(rowOfMeasurement):
     # i malen her mangler mange målinger, fyll ut selv det du trenger
         
     joyForward.append(float(rowOfMeasurement[2]))
-    joySide.append(int(rowOfMeasurement[3]))
+    joySide.append(float(rowOfMeasurement[3]))
     
     
     # i malen her mangler mange målinger, fyll ut selv det du trenger
@@ -315,8 +315,10 @@ def offline(filenameMeas, filenameCalcOffline):
         if len(filenameCalcOffline)>4:
             with open(filenameCalcOffline, "w") as f:
                 CalculatedToFileHeader = "Tallformatet viser til kolonnenummer:\n"
-                CalculatedToFileHeader += "0=Pos_vs_Hastighet, 1=Forward_vs_Side, \n"
-                CalculatedToFileHeader += "2=summeringAvPowerA, 3=powerA, 4=mellomRegninger \n"
+                CalculatedToFileHeader += "0=Ts, 1=PowerB, 2=PowerC, \n"
+                CalculatedToFileHeader += "3=IAE, 4=MAE \n"
+                CalculatedToFileHeader += "5=TV_B, 6=TV_C \n"
+                CalculatedToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys \n"
                 f.write(CalculatedToFileHeader)
 
                 # Lengde av de MÅLTE listene.
@@ -325,8 +327,15 @@ def offline(filenameMeas, filenameCalcOffline):
                     CalculatedToFile = ""
                     CalculatedToFile += str(Ts[i]) + ","
                     CalculatedToFile += str(PowerB[i]) + ","
-                    CalculatedToFile += str(PowerC[i]) + "\n"
-  
+                    CalculatedToFile += str(PowerC[i]) + ","
+                    CalculatedToFile += str(IAE[i]) + ","
+                    CalculatedToFile += str(MAE[i]) + ","
+                    CalculatedToFile += str(TV_B[i]) + ","
+                    CalculatedToFile += str(TV_C[i]) + ","
+                    CalculatedToFile += str(Avvik[i]) + ","
+                    CalculatedToFile += str(medianLys[i]) + ","
+                    CalculatedToFile += str(STD_Lys[i]) + "\n"
+    
                     f.write(CalculatedToFile)
         #---------------------------------------------------------
 

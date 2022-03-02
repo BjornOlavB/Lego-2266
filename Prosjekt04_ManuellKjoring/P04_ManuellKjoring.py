@@ -41,13 +41,13 @@ import math
 wired = True
 
 # --> Filnavn for lagring av MÅLINGER som gjøres online
-filenameMeas = "Meas_P04_BeskrivendeTekst_Y.txt"
+filenameMeas = "Meas_P04_ManuellKjøring.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres online
 #     Typisk navn:  "CalcOnline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå
 #     filenameCalcOnline = ".txt"
-filenameCalcOnline = "CalcOnline_P04_BeskrivendeTekst_Y.txt"
+filenameCalcOnline = "CalcOnline_P04_ManuellKjøring.txt"
 # --------------------------------------------------------------------
 
 
@@ -380,7 +380,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
 
     # Parametre
     a = 0.3                                               #'Gir' for bil
-    b = 0.7
+    b = 0.6
     m = 1
     # Pådragsberegning
     PowerB.append(b*joySide[-1] + a*joyForward[-1])
@@ -400,9 +400,11 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
         Ts.append(Tid[-1]-Tid[-2])
         Avvik.append(Lys[-1] - referanse)
         IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
-        MAE.append(mean_abs_error(Avvik, m))     
+        MAE.append(mean_abs_error(Avvik, m))   
+
         TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
         TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
+
         medianLys.append(median(Lys))
         STD_Lys.append(STD(Lys[-1],medianLys[-1],STD_Lys))
     # Matematiske beregninger
