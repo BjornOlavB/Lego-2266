@@ -21,20 +21,20 @@ except Exception as e:
 online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.203.176"
+EV3_IP = "169.254.53.245"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P04_ManuellKjøring.txt"
+filenameMeas = "Meas_P04_BjørnOlav.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå 
 #     filenameCalcOffline = ".txt"
-filenameCalcOffline = "CalcOffline_P04_ManuellKjøring.txt"
+filenameCalcOffline = "CalcOffline_P04_Simon.txt"
 #---------------------------------------------------------------------
 
 
