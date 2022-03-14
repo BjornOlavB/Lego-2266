@@ -21,20 +21,20 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.224.208"
+EV3_IP = "169.254.71.111"
 
 # Hvis online = False, husk å overføre filen med målinger og
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P01_NumeriskIntegrasjon.txt"
+filenameMeas = "Meas_P01_NumeriskIntegrasjon-chirp.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå
 #     filenameCalcOffline = ".txt"
-filenameCalcOffline = "CalcOffline_P01_NumeriskIntegrasjon-sinus.txt"
+filenameCalcOffline = "CalcOffline_P01_NumeriskIntegrasjon_CHIRP.txt"
 # ---------------------------------------------------------------------
 
 
@@ -42,7 +42,8 @@ if not online:
     # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     #       B) offline: MEASUREMENTS. INTITALIZE LISTS ACCORDING TO 6)
     #
-    # Denne seksjonen kjøres kun i offline og initialiserer TOMME
+    # Denne seksjonen kjøres kun i o
+    # ffline og initialiserer TOMME
     # lister for MÅLINGENE som pakkes opp fra .txt-filen i seksjon
     #   -->  E) offline: UNPACK MEASUREMENTS FROM FILE ACCORDING TO 6)
     # nedenfor.

@@ -46,7 +46,7 @@ filenameMeas = "Meas_P01_NumeriskIntegrasjon.txt"
 #     Typisk navn:  "CalcOnline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå
 #     filenameCalcOnline = ".txt"
-filenameCalcOnline = "CalcOnline_P01_NumeriskIntegrasjon.txt"
+filenameCalcOnline = "CalcOnline_P01_NumeriskIntegrasjon-konstant.txt"
 # --------------------------------------------------------------------
 
 
