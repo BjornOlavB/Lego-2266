@@ -140,6 +140,7 @@ def main():
         AvvikFilter = []
         I = []
         
+        
 
         medianLys = []
         STD_Lys = []
@@ -379,15 +380,15 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys):
+def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys, P_regulator):
 
     # Parametre
     u_0 = 15
     a = 0.3                                               #'Gir' for bil
     b = 0.6
-    Kp = 1
-    Ki = 1
-    Kd = 1
+    Kp = 0.5
+    Ki = 0
+    Kd = 0
     m = 15
     alpha = 0.3
     #Avvik beregning
@@ -406,6 +407,9 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         middleLys.append(0)                               
         STD_Lys.append(0)
         I.append(0)
+        PowerB.append(0)
+        PowerC.append(0)
+        P_regulator.append(0)
         
     else:
         Ts.append(Tid[-1]-Tid[-2])
@@ -429,6 +433,8 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         
         STD_Lys.append(STD(Lys[-1],referanse,STD_Lys))
         
+        P_regulator.append(PID(u_0,Kp,Kd,Avvik,AvvikFilter,I,Ts))
+        
     # Matematiske beregninger
                    
 
@@ -443,7 +449,7 @@ def PID(u_0,Kp,Kd,e_t,ef_t,I,ts):
     # e_t        -->    Deviation form refernece
     # ef_t       -->    Filterd Deviation form refernece
     # I          -->    Integrated I part
-    return u_0 + Kp*e_t[-1] + I[-1] + Kd*Derivasjon(ef_t,ts)
+    return  Kp*e_t[-1] + I[-1] + Kd*Derivasjon(ef_t,ts)
 
 def IIR_filter(list,IIR_prev,alpha):
 
