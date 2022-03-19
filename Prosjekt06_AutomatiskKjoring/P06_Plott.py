@@ -21,7 +21,7 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.53.5"
+EV3_IP = "169.254.119.201"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
@@ -216,7 +216,7 @@ def unpackData(rowOfData):
 # Dersom både nrows > 1 og ncols > 1,  så må ax gis 2 argumenter 
 # som ax[0,0], ax[1,0], osv
 fig, ax = plt.subplots(nrows=3, ncols=2, sharex=True)
-fig2, ax2 = plt.subplots(nrows=1, ncols=1, sharex=True)
+
 
 # Vær obs på at ALLE delfigurene må inneholde data. 
 # Repeter om nødvendig noen delfigurer for å fylle ut.
@@ -251,8 +251,7 @@ def plotData():
     ax[2,0].plot(Tid[0:], TV_C[0:], 'c')
     ax[2,1].plot(Tid[0:], MAE[0:], 'b')
 
-def plotHist():
-    ax2.hist(Lys[0:],edgecolor="black",color="g",align="left", bins=40)
+
     
 #---------------------------------------------------------------------
 
@@ -347,7 +346,7 @@ def offline(filenameMeas, filenameCalcOffline):
     figureTitles()
     plotData()
     stopPlot()
-    plotHist()
+    
     # Set plot layout and show plot.
     fig.set_tight_layout(True)  # mac
     plt.show()

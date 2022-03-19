@@ -385,9 +385,9 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
     u_0 = 15
     a = 0.3                                               #'Gir' for bil
     b = 0.6
-    Kp = 0.5
-    Ki = 0
-    Kd = 0
+    Kp = 3.5
+    Ki = 1.4
+    Kd = 0.3
     m = 15
     alpha = 0.3
     #Avvik beregning
