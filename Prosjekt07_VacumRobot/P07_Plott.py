@@ -120,6 +120,7 @@ else:
     joyForward = []
     joySide = []
     Avstand = []
+    GyroAngle = []
     
     # egne variable
     Ts = []
@@ -132,6 +133,8 @@ else:
     Avvik = []
     medianLys = []
     STD_Lys = []
+    PosX = []
+    PosY = []
 
     
     
@@ -159,14 +162,15 @@ def unpackMeasurement(rowOfMeasurement):
     Tid.append(float(rowOfMeasurement[0]))
     Lys.append(float(rowOfMeasurement[1]))
     Avstand.append(float(rowOfMeasurement[2]))
+    GyroAngle.append(float(rowOfMeasurement[3]))
     
 
     
   
     # i malen her mangler mange målinger, fyll ut selv det du trenger
         
-    joyForward.append(float(rowOfMeasurement[3]))
-    joySide.append(float(rowOfMeasurement[4]))
+    joyForward.append(float(rowOfMeasurement[4]))
+    joySide.append(float(rowOfMeasurement[5]))
     
     
     # i malen her mangler mange målinger, fyll ut selv det du trenger
@@ -192,6 +196,7 @@ def unpackData(rowOfData):
     Avstand.append(rowOfData["Avstand"])
     joyForward.append(rowOfData["joyForward"])
     joySide.append(rowOfData["joySide"])
+    GyroAngle.append(rowOfData["GyroAngle"])
 
     # egne variable
     Ts.append(rowOfData["Ts"])
@@ -204,6 +209,8 @@ def unpackData(rowOfData):
     Avvik.append(rowOfData["Avvik"])
     medianLys.append(rowOfData["MedianLys"])
     STD_Lys.append(rowOfData["STD_Lys"])
+    PosX.append(rowOfData["PosX"])
+    PosY.append(rowOfData["PosY"])
 
                 
 #-------------------------------------------------------------
@@ -228,9 +235,9 @@ def figureTitles():
     ax[0,0].set_title('Referanse(r) Lys(b)')
     ax[0,1].set_title('Avstand e(k)')
     ax[1,0].set_title('PowerB (b) PowerC (r)')
-    ax[1,1].set_title('IAE(k)')
+    ax[1,1].set_title('Vinkel')
     ax[2,0].set_title('TV_B (b) TV_C (r)')
-    ax[2,1].set_title('MAE(k)')
+    ax[2,1].set_title('Position')
     # Vær obs på at ALLE delfigurene må inneholde data. 
 
     ax[0,0].set_xlabel('Tid [sec]')
@@ -249,10 +256,10 @@ def plotData():
     ax[0,1].plot(Tid[0:], Avstand[0:], 'g')
     ax[1,0].plot(Tid[0:], PowerB[0:], 'b')
     ax[1,0].plot(Tid[0:], PowerC[0:], 'r')
-    ax[1,1].plot(Tid[0:], IAE[0:], 'b')
+    ax[1,1].plot(Tid[0:], GyroAngle[0:], 'b')
     ax[2,0].plot(Tid[0:], TV_B[0:], 'b')
     ax[2,0].plot(Tid[0:], TV_C[0:], 'c')
-    ax[2,1].plot(Tid[0:], MAE[0:], 'b')
+    ax[2,1].plot(PosX[0:], PosY[0:], 'g')
 
 
     

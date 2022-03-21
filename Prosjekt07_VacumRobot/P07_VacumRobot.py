@@ -70,6 +70,8 @@ def main():
         # oppdater portnummer
         myColorSensor = ColorSensor(Port.S3)
         myUltrasonicSensor = UltrasonicSensor(Port.S2)
+        myGyroSensor = GyroSensor(Port.SX)
+
 
         motorB = Motor(Port.B)
         motorB.reset_angle(0)
@@ -142,6 +144,9 @@ def main():
         AvvikFilter = []
         I = []
         reverse = []
+        posX = []
+        posY = []
+        GyroAngle = []          # måling av gyrovinkel fra GyroSensor
         
         
 
@@ -176,6 +181,7 @@ def main():
 
             Lys.append(myColorSensor.reflection())
             Avstand.append(myUltrasonicSensor.distance())
+            GyroAngle.append(myGyroSensor.angle())
             
             joyForward.append(config.joyForwardInstance)
             joySide.append(config.joySideInstance)
@@ -205,7 +211,7 @@ def main():
             # Husk at siste element i strengen må være '\n'
             if k == 0:
                 MeasurementToFileHeader = "Tall viser til kolonnenummer:\n"
-                MeasurementToFileHeader += "0=Tid, 1=Lys, 2=Avstand, 3= \n"
+                MeasurementToFileHeader += "0=Tid, 1=Lys, 2=Avstand, 3=Vinkel \n"
                 MeasurementToFileHeader += "4=, 5=, 6=, 7= \n"
                 MeasurementToFileHeader += "8=, 9= \n"
                 robot["measurements"].write(MeasurementToFileHeader)
@@ -213,11 +219,8 @@ def main():
             MeasurementToFile = ""
             MeasurementToFile += str(Tid[-1]) + ","
             MeasurementToFile += str(Lys[-1]) + ","
-            MeasurementToFile += str(Avstand[-1]) + ","
-          
-    
-            MeasurementToFile += str(joyForward[-1]) + ","
-            MeasurementToFile += str(joySide[-1]) + "\n"
+            MeasurementToFile += str(GyroAngle[-1]) + ","
+            MeasurementToFile += str(Avstand[-1]) + "\n"
             
 
             
@@ -237,7 +240,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene.
 
-            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,Avstand,reverse)
+            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,Avstand,reverse,GyroAngle,PosX,PosY)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -270,6 +273,7 @@ def main():
                     CalculationsToFileHeader += "3=IAE, 4=MAE \n"
                     CalculationsToFileHeader += "5=TV_B, 6=TV_C \n"
                     CalculationsToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys \n"
+                    CalculationsToFileHeader += "10=GyroAngle, 11=PosX, 12=PosY \n"
                     robot["calculations"].write(CalculationsToFileHeader)
                 CalculationsToFile = ""
                 CalculationsToFile += str(Ts[-1]) + ","
@@ -281,7 +285,10 @@ def main():
                 CalculationsToFile += str(TV_C[-1]) + ","
                 CalculationsToFile += str(Avvik[-1]) + ","
                 CalculationsToFile += str(medianLys[-1]) + ","
-                CalculationsToFile += str(STD_Lys[-1]) + "\n"
+                CalculationsToFile += str(STD_Lys[-1]) + ","
+                CalculationsToFile += str(GyroAngle[-1]) + ","
+                CalculationsToFile += str(PosX[-1]) + ","
+                CalculationsToFile += str(PosY[-1]) + "\n"
 
                 # Skriv CalcultedToFile til .txt-filen navngitt i seksjon 1)
                 robot["calculations"].write(CalculationsToFile)
@@ -314,6 +321,8 @@ def main():
                 DataToOnlinePlot["Avstand"] = (Avstand[-1])
                 DataToOnlinePlot["joyForward"] = (joyForward[-1])
                 DataToOnlinePlot["joySide"] = (joySide[-1])
+                DataToOnlinePlot["GyroAngle"] = (GyroAngle[-1])
+
 
                 # egne variable
                 DataToOnlinePlot["Ts"] = (Ts[-1])
@@ -326,6 +335,8 @@ def main():
                 DataToOnlinePlot["Avvik"] = (Avvik[-1])
                 DataToOnlinePlot["MedianLys"] = (medianLys[-1])
                 DataToOnlinePlot["STD_Lys"] = (STD_Lys[-1])
+                DataToOnlinePlot["PosX"] = (PosX[-1])
+                DataToOnlinePlot["PosY"] = (PosY[-1])
 
                 # sender over data
                 msg = json.dumps(DataToOnlinePlot)
@@ -385,7 +396,7 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys,Avstand,reverse):
+def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys,Avstand,reverse,GyroAngle,PosX,PosY):
 
     # Parametre
     u_0 = 15
@@ -415,6 +426,8 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         I.append(0)
         PowerB.append(0)
         PowerC.append(0)
+        PosX.append(0)
+        PosY.append(0)
         
     else:
         Ts.append(Tid[-1]-Tid[-2])
@@ -425,6 +438,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         I.append(EulerForward(Ki*Avvik[-1],Ts[-1],I[-1]))
         
         # Pådragsberegning
+        # Checks distance to wall
         if Avstand[-1] <= 90:
             reverse.append(True)
         if reverse[-1]:
@@ -442,6 +456,11 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         else:
             PowerB.append(u_0)
             PowerC.append(u_0)
+
+        #Postion Calulation
+        PosX.append(EulerForward(u_0,Ts[-1],PosX[-1])*math.cos(GyroAnlge[-1]))
+        PosY.append(EulerForward(u_0,Ts[-1],PosY[-1])*math.sin(GyroAngle[-1])) 
+         
         
         IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
         MAE.append(mean_abs_error(Avvik, m))   
