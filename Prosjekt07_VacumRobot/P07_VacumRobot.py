@@ -458,8 +458,9 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
             PowerC.append(u_0)
 
         #Postion Calulation
-        PosX.append(EulerForward(u_0,Ts[-1],PosX[-1])*math.cos(GyroAnlge[-1]))
-        PosY.append(EulerForward(u_0,Ts[-1],PosY[-1])*math.sin(GyroAngle[-1])) 
+        avgSpeed = (PowerB[-1]+PowerC[-1])/2
+        PosX.append(EulerForward(avgSpeed,Ts[-1],PosX[-1])*math.cos(GyroAnlge[-1]))
+        PosY.append(EulerForward(avgSpeed,Ts[-1],PosY[-1])*math.sin(GyroAngle[-1])) 
          
         
         IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
