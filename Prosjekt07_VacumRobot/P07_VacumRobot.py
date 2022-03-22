@@ -70,8 +70,7 @@ def main():
         # oppdater portnummer
         myColorSensor = ColorSensor(Port.S3)
         myUltrasonicSensor = UltrasonicSensor(Port.S2)
-        myGyroSensor = GyroSensor(Port.SX)
-
+        myGyroSensor = GyroSensor(Port.S4)
 
         motorB = Motor(Port.B)
         motorB.reset_angle(0)
@@ -104,11 +103,10 @@ def main():
 
         Tid = []                # registring av tidspunkt for målinger
         Lys = []                # måling av reflektert lys fra ColorSensor
-        
+
         joyForward = []         # måling av foroverbevegelse styrestikke
         joySide = []            # måling av sidebevegelse styrestikke
         Avstand = []        # målinger av lydsensor
-        
 
         print("3) MEASUREMENTS. LISTS INITIALIZED.")
         # ------------------------------------------------------------
@@ -144,11 +142,9 @@ def main():
         AvvikFilter = []
         I = []
         reverse = []
-        posX = []
-        posY = []
+        PosX = []
+        PosY = []
         GyroAngle = []          # måling av gyrovinkel fra GyroSensor
-        
-        
 
         medianLys = []
         STD_Lys = []
@@ -182,13 +178,10 @@ def main():
             Lys.append(myColorSensor.reflection())
             Avstand.append(myUltrasonicSensor.distance())
             GyroAngle.append(myGyroSensor.angle())
-            
+
             joyForward.append(config.joyForwardInstance)
             joySide.append(config.joySideInstance)
-           
-        
 
-            
             # --------------------------------------------------------
 
             # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -221,9 +214,6 @@ def main():
             MeasurementToFile += str(Lys[-1]) + ","
             MeasurementToFile += str(GyroAngle[-1]) + ","
             MeasurementToFile += str(Avstand[-1]) + "\n"
-            
-
-            
 
             # Skriv MeasurementToFile til .txt-filen navngitt øverst
             robot["measurements"].write(MeasurementToFile)
@@ -240,13 +230,13 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene.
 
-            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,Avstand,reverse,GyroAngle,PosX,PosY)
+            MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I,
+                             PowerB, PowerC, medianLys, STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
             motorB.dc(PowerB[-1])
             motorC.dc(PowerC[-1])
-
 
             # --------------------------------------------------------
 
@@ -323,7 +313,6 @@ def main():
                 DataToOnlinePlot["joySide"] = (joySide[-1])
                 DataToOnlinePlot["GyroAngle"] = (GyroAngle[-1])
 
-
                 # egne variable
                 DataToOnlinePlot["Ts"] = (Ts[-1])
                 DataToOnlinePlot["PowerB"] = (PowerB[-1])
@@ -372,7 +361,6 @@ def main():
         # - hold() bråstopper umiddelbart og holder posisjonen
         motorB.brake()
         motorC.brake()
-        
 
         # Lukker forbindelsen til både styrestikke og EV3.
         CloseJoystickAndEV3(robot, wired)
@@ -396,119 +384,128 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys,Avstand,reverse,GyroAngle,PosX,PosY):
+def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC, middleLys, STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY):
 
     # Parametre
     u_0 = 15
-    a = 0.3                                               #'Gir' for bil
+    a = 0.3  # 'Gir' for bil
     b = 0.6
     Kp = 3.5
     Ki = 1.4
     Kd = 0.3
     m = 15
     alpha = 0.3
-    #Avvik beregning
-    referanse = Lys[0]   
-    
+    # Avvik beregning
+    referanse = Lys[0]
+
     # Initialverdibereging
-    
+
     if len(Tid) == 1:
         reverse.append(False)
-        Ts.append(0)                                      #Tidsskritt
-        IAE.append(0)                                       #Integral of Absolute Error
-        MAE.append(0)                                       #Mean Absoute Error
-        TV_B.append(0)                                      #Total Variaton motorB
+        Ts.append(0)  # Tidsskritt
+        IAE.append(0)  # Integral of Absolute Error
+        MAE.append(0)  # Mean Absoute Error
+        TV_B.append(0)  # Total Variaton motorB
         TV_C.append(0)
-        Avvik.append(0)                                      #Total Variaton motorC
-        AvvikFilter.append(0)                                      #Total Variaton motorC
-        middleLys.append(0)                               
+        Avvik.append(0)  # Total Variaton motorC
+        AvvikFilter.append(0)  # Total Variaton motorC
+        middleLys.append(0)
         STD_Lys.append(0)
         I.append(0)
         PowerB.append(0)
         PowerC.append(0)
         PosX.append(0)
         PosY.append(0)
-        
+
     else:
         Ts.append(Tid[-1]-Tid[-2])
 
         Avvik.append(Lys[-1] - referanse)
-        AvvikFilter.append(IIR_filter(Avvik,AvvikFilter,alpha))
+        AvvikFilter.append(IIR_filter(Avvik, AvvikFilter, alpha))
 
-        I.append(EulerForward(Ki*Avvik[-1],Ts[-1],I[-1]))
-        
+        I.append(EulerForward(Ki*Avvik[-1], Ts[-1], I[-1]))
+
         # Pådragsberegning
         # Checks distance to wall
         if Avstand[-1] <= 90:
             reverse.append(True)
         if reverse[-1]:
             if Avstand[-1] <= 200:
-                if Avstand[-1] <= 190:
+
+                if Avstand[-1] <= 150:
                     PowerB.append(-u_0)
                     PowerC.append(-u_0)
+                    avgSpeed = (PowerB[-1]+PowerC[-1])/2
+                    PosX.append(EulerForward(
+                        avgSpeed, Ts[-1], PosX[-1])*math.cos(GyroAngle[-1]))
+                    PosY.append(EulerForward(
+                        avgSpeed, Ts[-1], PosY[-1])*math.sin(GyroAngle[-1]))
                 else:
-                    a = random.randrange(15,30)
+                    a = random.randrange(15, 30)
                     PowerB.append(a)
                     PowerC.append(-a)
-                
+
             else:
                 reverse.append(False)
         else:
             PowerB.append(u_0)
             PowerC.append(u_0)
 
-        #Postion Calulation
-        avgSpeed = (PowerB[-1]+PowerC[-1])/2
-        PosX.append(EulerForward(avgSpeed,Ts[-1],PosX[-1])*math.cos(GyroAnlge[-1]))
-        PosY.append(EulerForward(avgSpeed,Ts[-1],PosY[-1])*math.sin(GyroAngle[-1])) 
-         
-        
-        IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
-        MAE.append(mean_abs_error(Avvik, m))   
+        # Postion Calulation
+            avgSpeed = (PowerB[-1]+PowerC[-1])/2
+            PosX.append(EulerForward(
+                avgSpeed, Ts[-1], PosX[-1])*math.cos(GyroAngle[-1]))
+            PosY.append(EulerForward(
+                avgSpeed, Ts[-1], PosY[-1])*math.sin(GyroAngle[-1]))
 
-        TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
-        TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
+        # Numerisk integrasjon av Lys - referanse
+        IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))
+        MAE.append(mean_abs_error(Avvik, m))
+
+        TV_B.append(TV(PowerB[-1], PowerB[-2], TV_B))
+        TV_C.append(TV(PowerC[-1], PowerC[-2], TV_C))
 
         middleLys.append(middleValue(Lys))
-        
-        STD_Lys.append(STD(Lys[-1],referanse,STD_Lys))
-        
-    # Matematiske beregninger
-                   
 
-    
-                      
+        STD_Lys.append(STD(Lys[-1], referanse, STD_Lys))
+
+    # Matematiske beregninger
+
 
 # ---------------------------------------------------------------------
 
-def PID(u_0,Kp,Kd,e_t,ef_t,I,ts):
+def PID(u_0, Kp, Kd, e_t, ef_t, I, ts):
     # u_0        -->    Base pull
     # Kp, Ki, Kd -->    Constants
     # e_t        -->    Deviation form refernece
     # ef_t       -->    Filterd Deviation form refernece
     # I          -->    Integrated I part
-    return  Kp*e_t[-1] + I[-1] + Kd*Derivasjon(ef_t,ts)
+    return Kp*e_t[-1] + I[-1] + Kd*Derivasjon(ef_t, ts)
 
-def IIR_filter(list,IIR_prev,alpha):
+
+def IIR_filter(list, IIR_prev, alpha):
 
     IIR_Value = alpha*list[-1]+(1-alpha)*IIR_prev[-1]
     return IIR_Value
+
 
 def EulerForward(functionValue, Ts, intValueOld):
     intValueNew = intValueOld + Ts*functionValue
     return abs(intValueNew)
 
-def Derivasjon(functionValue,dt):
-    
+
+def Derivasjon(functionValue, dt):
+
     derivative = (functionValue[-1] - functionValue[-2]) / (dt[-1])
     return derivative
 
-def TV(functionValue,functionValueOld,TV):
+
+def TV(functionValue, functionValueOld, TV):
     return TV[-1] + abs(functionValue-functionValueOld)
 
 
 def mean_abs_error(list, m):
-                                           
+
     if len(list) < m:
         # sjekker at m ikke er større en k
         m = len(list)
@@ -518,10 +515,12 @@ def mean_abs_error(list, m):
     # Retunering av utregnet verdi FIR VALUE
     return abs(intValueNew)
 
+
 def middleValue(list):
     return (sum(list))/len(list)
 
-def STD(list,medianList,std):
+
+def STD(list, medianList, std):
     return math.sqrt((std[-1]+(list-medianList)**2)/(len(std)))
 
 
