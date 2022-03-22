@@ -435,11 +435,9 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
                 if Avstand[-1] <= 150:
                     PowerB.append(-u_0)
                     PowerC.append(-u_0)
-                    avgSpeed = (PowerB[-1]+PowerC[-1])/2
-                    PosX.append(EulerForward(
-                        avgSpeed, Ts[-1], PosX[-1])*math.cos(GyroAngle[-1]))
-                    PosY.append(EulerForward(
-                        avgSpeed, Ts[-1], PosY[-1])*math.sin(GyroAngle[-1]))
+                    
+                    PosX.append(-u_0*math.cos(GyroAngle[-1])*Ts[-1]+PosX[-1])
+                    PosY.append(-u_0*math.sin(GyroAngle[-1])*Ts[-1]+PosY[-1])
                 else:
                     a = random.randrange(15, 30)
                     PowerB.append(a)
@@ -452,11 +450,9 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
             PowerC.append(u_0)
 
         # Postion Calulation
-            avgSpeed = (PowerB[-1]+PowerC[-1])/2
-            PosX.append(EulerForward(
-                avgSpeed, Ts[-1], PosX[-1])*math.cos(GyroAngle[-1]))
-            PosY.append(EulerForward(
-                avgSpeed, Ts[-1], PosY[-1])*math.sin(GyroAngle[-1]))
+            
+            PosX.append(u_0*math.cos(GyroAngle[-1])*Ts[-1]+PosX[-1])
+            PosY.append(u_0*math.sin(GyroAngle[-1])*Ts[-1]+PosY[-1])
 
         # Numerisk integrasjon av Lys - referanse
         IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))
