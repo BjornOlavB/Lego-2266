@@ -108,6 +108,11 @@ def main():
         joySide = []            # måling av sidebevegelse styrestikke
         Avstand = []        # målinger av lydsensor
 
+        VinkelPosMotorB = []    # vinkelposisjon motor B 
+        HastighetMotorB = []    # hastighet motor B
+        VinkelPosMotorC = []    # vinkelposisjon motor C
+        HastighetMotorC = []    # hastighet motor C
+
         print("3) MEASUREMENTS. LISTS INITIALIZED.")
         # ------------------------------------------------------------
 
@@ -145,7 +150,7 @@ def main():
         PosX = []
         PosY = []
         GyroAngle = []          # måling av gyrovinkel fra GyroSensor
-
+        rTimer = []
         medianLys = []
         STD_Lys = []
 
@@ -177,7 +182,12 @@ def main():
 
             Lys.append(myColorSensor.reflection())
             Avstand.append(myUltrasonicSensor.distance())
-            GyroAngle.append(myGyroSensor.angle())
+            GyroAngle.append(-myGyroSensor.angle())
+
+            VinkelPosMotorB.append(motorB.angle())
+            HastighetMotorB.append(motorB.speed())
+            VinkelPosMotorC.append(motorC.angle())
+            HastighetMotorC.append(motorC.speed())
 
             joyForward.append(config.joyForwardInstance)
             joySide.append(config.joySideInstance)
@@ -204,8 +214,8 @@ def main():
             # Husk at siste element i strengen må være '\n'
             if k == 0:
                 MeasurementToFileHeader = "Tall viser til kolonnenummer:\n"
-                MeasurementToFileHeader += "0=Tid, 1=Lys, 2=Avstand, 3=Vinkel \n"
-                MeasurementToFileHeader += "4=, 5=, 6=, 7= \n"
+                MeasurementToFileHeader += "0=Tid, 1=Lys, 2=Vinkel, 3=Avstand \n"
+                MeasurementToFileHeader += "4=VinkelPosMotorB, 5=VinkelPosMotor, 6=HastighetMotorC, 7=HastighetMotorB \n"
                 MeasurementToFileHeader += "8=, 9= \n"
                 robot["measurements"].write(MeasurementToFileHeader)
 
@@ -213,7 +223,11 @@ def main():
             MeasurementToFile += str(Tid[-1]) + ","
             MeasurementToFile += str(Lys[-1]) + ","
             MeasurementToFile += str(GyroAngle[-1]) + ","
-            MeasurementToFile += str(Avstand[-1]) + "\n"
+            MeasurementToFile += str(Avstand[-1]) + ","
+            MeasurementToFile += str(VinkelPosMotorC[-1]) + ","
+            MeasurementToFile += str(VinkelPosMotorB[-1]) + ","
+            MeasurementToFile += str(HastighetMotorC[-1]) + ","
+            MeasurementToFile += str(HastighetMotorB[-1]) + "\n"
 
             # Skriv MeasurementToFile til .txt-filen navngitt øverst
             robot["measurements"].write(MeasurementToFile)
@@ -231,12 +245,13 @@ def main():
             # nedenfor. Du må også kommentere bort motorpådragene.
 
             MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I,
-                             PowerB, PowerC, medianLys, STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY)
+                             PowerB, PowerC, medianLys, STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY,rTimer,VinkelPosMotorB,VinkelPosMotorC)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
-            motorB.dc(PowerB[-1])
-            motorC.dc(PowerC[-1])
+            
+            motorB.run(PowerB[-1])
+            motorC.run(PowerC[-1])
 
             # --------------------------------------------------------
 
@@ -261,7 +276,7 @@ def main():
                     CalculationsToFileHeader = "Tallformatet viser til kolonnenummer:\n"
                     CalculationsToFileHeader += "0=Ts, 1=PowerB, 2=PowerC, \n"
                     CalculationsToFileHeader += "3=IAE, 4=MAE \n"
-                    CalculationsToFileHeader += "5=TV_B, 6=TV_C \n"
+                    CalculationsToFileHeader += "5=VinkelPosMotorC, 6=VinkelPosMotorB \n"
                     CalculationsToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys \n"
                     CalculationsToFileHeader += "10=GyroAngle, 11=PosX, 12=PosY \n"
                     robot["calculations"].write(CalculationsToFileHeader)
@@ -271,8 +286,8 @@ def main():
                 CalculationsToFile += str(PowerC[-1]) + ","
                 CalculationsToFile += str(IAE[-1]) + ","
                 CalculationsToFile += str(MAE[-1]) + ","
-                CalculationsToFile += str(TV_B[-1]) + ","
-                CalculationsToFile += str(TV_C[-1]) + ","
+                CalculationsToFile += str(VinkelPosMotorC[-1]) + ","
+                CalculationsToFile += str(VinkelPosMotorB[-1]) + ","
                 CalculationsToFile += str(Avvik[-1]) + ","
                 CalculationsToFile += str(medianLys[-1]) + ","
                 CalculationsToFile += str(STD_Lys[-1]) + ","
@@ -312,6 +327,8 @@ def main():
                 DataToOnlinePlot["joyForward"] = (joyForward[-1])
                 DataToOnlinePlot["joySide"] = (joySide[-1])
                 DataToOnlinePlot["GyroAngle"] = (GyroAngle[-1])
+                DataToOnlinePlot["VinkelPosMotorB"] = (VinkelPosMotorB[-1])
+                DataToOnlinePlot["VinkelposMotorC"] = (VinkelPosMotorC[-1])
 
                 # egne variable
                 DataToOnlinePlot["Ts"] = (Ts[-1])
@@ -326,6 +343,7 @@ def main():
                 DataToOnlinePlot["STD_Lys"] = (STD_Lys[-1])
                 DataToOnlinePlot["PosX"] = (PosX[-1])
                 DataToOnlinePlot["PosY"] = (PosY[-1])
+                
 
                 # sender over data
                 msg = json.dumps(DataToOnlinePlot)
@@ -384,10 +402,13 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC, middleLys, STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY):
+def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC, middleLys, 
+    STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY,rTimer,vinkelPosB,vinkelPosC):
 
     # Parametre
-    u_0 = 15
+    u_0 = 150
+    d = 17.25*10**-2
+    speed = d*u_0
     a = 0.3  # 'Gir' for bil
     b = 0.6
     Kp = 3.5
@@ -412,8 +433,8 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
         middleLys.append(0)
         STD_Lys.append(0)
         I.append(0)
-        PowerB.append(0)
-        PowerC.append(0)
+        PowerB.append(u_0)
+        PowerC.append(u_0)
         PosX.append(0)
         PosY.append(0)
 
@@ -427,32 +448,33 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
 
         # Pådragsberegning
         # Checks distance to wall
-        if Avstand[-1] <= 90:
+        rad = (GyroAngle[-1]/180)*math.pi
+        if Avstand[-1] <= 150 or Lys[-1] <= 10:
             reverse.append(True)
+            rTimer.clear()
         if reverse[-1]:
-            if Avstand[-1] <= 200:
-
-                if Avstand[-1] <= 150:
+            if sum(rTimer) <= 1:
                     PowerB.append(-u_0)
                     PowerC.append(-u_0)
                     
-                    PosX.append(-u_0*math.cos(GyroAngle[-1])*Ts[-1]+PosX[-1])
-                    PosY.append(-u_0*math.sin(GyroAngle[-1])*Ts[-1]+PosY[-1])
-                else:
-                    a = random.randrange(15, 30)
-                    PowerB.append(a)
-                    PowerC.append(-a)
-
+                    PosX.append(-speed*math.cos(rad)*Ts[-1]+PosX[-1])
+                    PosY.append(-speed*math.sin(rad)*Ts[-1]+PosY[-1])
+                    rTimer.append(Ts[-1])
+            elif sum(rTimer) <= 2:
+                    
+                    PowerB.append(u_0)
+                    PowerC.append(-u_0)
+                    rTimer.append(Ts[-1])
             else:
-                reverse.append(False)
+                    reverse.append(False)
         else:
             PowerB.append(u_0)
             PowerC.append(u_0)
 
         # Postion Calulation
             
-            PosX.append(u_0*math.cos(GyroAngle[-1])*Ts[-1]+PosX[-1])
-            PosY.append(u_0*math.sin(GyroAngle[-1])*Ts[-1]+PosY[-1])
+            PosX.append(speed*math.cos(rad)*Ts[-1]+PosX[-1])
+            PosY.append(speed*math.sin(rad)*Ts[-1]+PosY[-1])
 
         # Numerisk integrasjon av Lys - referanse
         IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))

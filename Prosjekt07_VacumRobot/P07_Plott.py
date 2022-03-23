@@ -21,7 +21,7 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.195.209"
+EV3_IP = "169.254.74.36"
 
 # Hvis online = False, husk å overføre filen med målinger og
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
@@ -115,6 +115,10 @@ else:
     joySide = []
     Avstand = []
     GyroAngle = []
+    VinkelPosMotorB = []    # vinkelposisjon motor B 
+    HastighetMotorB = []    # hastighet motor B
+    VinkelPosMotorC = []    # vinkelposisjon motor C
+    HastighetMotorC = []    # hastighet motor C
 
     # egne variable
     Ts = []
@@ -184,6 +188,9 @@ def unpackData(rowOfData):
     joyForward.append(rowOfData["joyForward"])
     joySide.append(rowOfData["joySide"])
     GyroAngle.append(rowOfData["GyroAngle"])
+    VinkelPosMotorC.append(rowOfData["VinkelposMotorC"])
+    VinkelPosMotorB.append(rowOfData["VinkelPosMotorB"])
+    
 
     # egne variable
     Ts.append(rowOfData["Ts"])
@@ -210,7 +217,7 @@ def unpackData(rowOfData):
 # eller ncols = 1, så gis ax 1 argument som ax[0], ax[1], osv.
 # Dersom både nrows > 1 og ncols > 1,  så må ax gis 2 argumenter
 # som ax[0,0], ax[1,0], osv
-fig, ax = plt.subplots(nrows=3, ncols=2, sharex=True)
+fig, ax = plt.subplots(nrows=3, ncols=2)
 
 
 # Vær obs på at ALLE delfigurene må inneholde data.
@@ -230,7 +237,8 @@ def figureTitles():
     ax[1, 0].set_xlabel('Tid [sec]')
     ax[1, 1].set_xlabel('Tid [sec]')
     ax[2, 0].set_xlabel('Tid [sec]')
-    ax[2, 1].set_xlabel('Tid [sec]')
+    ax[2, 1].set_xlabel('Position')
+
 
 
 # Vær obs på at ALLE delfigurene må inneholde data.
@@ -242,8 +250,8 @@ def plotData():
     ax[1, 0].plot(Tid[0:], PowerB[0:], 'b')
     ax[1, 0].plot(Tid[0:], PowerC[0:], 'r')
     ax[1, 1].plot(Tid[0:], GyroAngle[0:], 'b')
-    ax[2, 0].plot(Tid[0:], TV_B[0:], 'b')
-    ax[2, 0].plot(Tid[0:], TV_C[0:], 'c')
+    ax[2, 0].plot(Tid[0:], VinkelPosMotorB[0:], 'b')
+    ax[2, 0].plot(Tid[0:], VinkelPosMotorC[0:], 'c')
     ax[2, 1].plot(PosX[0:], PosY[0:], 'g')
 
 
