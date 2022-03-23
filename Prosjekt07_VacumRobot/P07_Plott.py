@@ -131,9 +131,11 @@ else:
     Avvik = []
     medianLys = []
     STD_Lys = []
-    PosX = []
-    PosY = []
-
+    PosX1 = []
+    PosX2 = []
+    PosY1 = []
+    PosY2 = []
+    vinkel = []
     print("D) online: LISTS FOR DATA TO PLOT INITIALIZED.")
     # ---------------------------------------------------------------------
 
@@ -203,8 +205,10 @@ def unpackData(rowOfData):
     Avvik.append(rowOfData["Avvik"])
     medianLys.append(rowOfData["MedianLys"])
     STD_Lys.append(rowOfData["STD_Lys"])
-    PosX.append(rowOfData["PosX"])
-    PosY.append(rowOfData["PosY"])
+    PosX1.append(rowOfData["PosX1"])
+    PosX2.append(rowOfData["PosX2"])
+    PosY1.append(rowOfData["PosY1"])
+    PosY2.append(rowOfData["PosY2"])
 
 
 # -------------------------------------------------------------
@@ -218,6 +222,7 @@ def unpackData(rowOfData):
 # Dersom både nrows > 1 og ncols > 1,  så må ax gis 2 argumenter
 # som ax[0,0], ax[1,0], osv
 fig, ax = plt.subplots(nrows=3, ncols=2)
+fig2, ax2 = plt.subplots(nrows=1, ncols=1, sharex=True)
 
 
 # Vær obs på at ALLE delfigurene må inneholde data.
@@ -252,7 +257,12 @@ def plotData():
     ax[1, 1].plot(Tid[0:], GyroAngle[0:], 'b')
     ax[2, 0].plot(Tid[0:], VinkelPosMotorB[0:], 'b')
     ax[2, 0].plot(Tid[0:], VinkelPosMotorC[0:], 'c')
-    ax[2, 1].plot(PosX[0:], PosY[0:], 'g')
+    ax[2, 1].plot()
+
+def plotPosition():
+    ax2.plot(PosX1[0:],PosY1[0:],"g")
+    ax2.plot(PosX2[0:],PosY2[0:],"r")
+
 
 
 # ---------------------------------------------------------------------
@@ -348,6 +358,7 @@ def offline(filenameMeas, filenameCalcOffline):
     # Plot data (målinger og beregnede verdier) fra listene.
     figureTitles()
     plotData()
+    plotPosition()
     stopPlot()
 
     # Set plot layout and show plot.

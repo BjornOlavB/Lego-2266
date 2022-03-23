@@ -34,6 +34,7 @@ import _thread
 import sys
 import math
 import random
+from turtle import distance
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #            1) EXPERIMENT SETUP AND FILENAME
@@ -147,9 +148,12 @@ def main():
         AvvikFilter = []
         I = []
         reverse = []
-        PosX = []
-        PosY = []
-        GyroAngle = []          # måling av gyrovinkel fra GyroSensor
+        PosX1 = []
+        PosX2 = []
+        PosY1 = []
+        PosY2 = []
+        GyroAngle = [] 
+        vinkel = []         # måling av gyrovinkel fra GyroSensor
         rTimer = []
         medianLys = []
         STD_Lys = []
@@ -245,7 +249,7 @@ def main():
             # nedenfor. Du må også kommentere bort motorpådragene.
 
             MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I,
-                             PowerB, PowerC, medianLys, STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY,rTimer,VinkelPosMotorB,VinkelPosMotorC)
+                             PowerB, PowerC, medianLys, STD_Lys, Avstand, reverse, GyroAngle, PosX1, PosY1,PosX2,PosY2,rTimer,VinkelPosMotorB,VinkelPosMotorC,vinkel)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -341,8 +345,10 @@ def main():
                 DataToOnlinePlot["Avvik"] = (Avvik[-1])
                 DataToOnlinePlot["MedianLys"] = (medianLys[-1])
                 DataToOnlinePlot["STD_Lys"] = (STD_Lys[-1])
-                DataToOnlinePlot["PosX"] = (PosX[-1])
-                DataToOnlinePlot["PosY"] = (PosY[-1])
+                DataToOnlinePlot["PosX1"] = (PosX1[-1])
+                DataToOnlinePlot["PosX2"] = (PosX2[-1])
+                DataToOnlinePlot["PosY1"] = (PosY1[-1])
+                DataToOnlinePlot["PosY2"] = (PosY2[-1])
                 
 
                 # sender over data
@@ -403,12 +409,13 @@ def main():
 #   - seksjonene H) og 12) for offline bruk
 
 def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC, middleLys, 
-    STD_Lys, Avstand, reverse, GyroAngle, PosX, PosY,rTimer,vinkelPosB,vinkelPosC):
+    STD_Lys, Avstand, reverse, GyroAngle, PosX1, PosY1,PosX2,PosY2,rTimer,vinkelPosB,vinkelPosC,vinkel):
 
     # Parametre
-    u_0 = 150
-    d = 17.25*10**-2
-    speed = d*u_0
+    u_0 = 135
+    d = 17.25
+    rps = 360/u_0
+    speed = d*rps  # speed
     a = 0.3  # 'Gir' for bil
     b = 0.6
     Kp = 3.5
@@ -435,8 +442,11 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
         I.append(0)
         PowerB.append(u_0)
         PowerC.append(u_0)
-        PosX.append(0)
-        PosY.append(0)
+        PosX1.append(0)
+        PosX2.append(0)
+        PosY1.append(0)
+        PosY2.append(0)
+        vinkel.append(0)
 
     else:
         Ts.append(Tid[-1]-Tid[-2])
@@ -448,17 +458,22 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
 
         # Pådragsberegning
         # Checks distance to wall
-        rad = (GyroAngle[-1]/180)*math.pi
+        vinkel.append(vinkelPosB[-1]-vinkelPosC[-1])
+        rad_b = (vinkel[-1]/180)*math.pi
+        rad_a = (GyroAngle[-1]/180)*math.pi
         if Avstand[-1] <= 150 or Lys[-1] <= 10:
             reverse.append(True)
             rTimer.clear()
         if reverse[-1]:
+            
             if sum(rTimer) <= 1:
                     PowerB.append(-u_0)
                     PowerC.append(-u_0)
                     
-                    PosX.append(-speed*math.cos(rad)*Ts[-1]+PosX[-1])
-                    PosY.append(-speed*math.sin(rad)*Ts[-1]+PosY[-1])
+                    PosX1.append(-speed*math.cos(rad_a)*Ts[-1]+PosX1[-1])
+                    PosY1.append(-speed*math.sin(rad_a)*Ts[-1]+PosY1[-1])
+                    PosX2.append(-speed*math.cos(rad_b)*Ts[-1]+PosX2[-1])
+                    PosY2.append(-speed*math.sin(rad_b)*Ts[-1]+PosY2[-1])
                     rTimer.append(Ts[-1])
             elif sum(rTimer) <= 2:
                     
@@ -473,8 +488,10 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
 
         # Postion Calulation
             
-            PosX.append(speed*math.cos(rad)*Ts[-1]+PosX[-1])
-            PosY.append(speed*math.sin(rad)*Ts[-1]+PosY[-1])
+            PosX1.append(speed*math.cos(rad_a)*Ts[-1]+PosX1[-1])
+            PosY1.append(speed*math.sin(rad_a)*Ts[-1]+PosY1[-1])
+            PosX2.append(speed*math.cos(rad_b)*Ts[-1]+PosX2[-1])
+            PosY2.append(speed*math.sin(rad_b)*Ts[-1]+PosY2[-1])
 
         # Numerisk integrasjon av Lys - referanse
         IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))
