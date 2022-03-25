@@ -18,7 +18,7 @@ except Exception as e:
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = True
+online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
 EV3_IP = "169.254.32.35"
@@ -28,13 +28,13 @@ EV3_IP = "169.254.32.35"
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P04_Simon.txt"
+filenameMeas = "Meas_P07_VacuRobot.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå
 #     filenameCalcOffline = ".txt"
-filenameCalcOffline = "CalcOffline_P04_Magnus.txt"
+filenameCalcOffline = "CalcOffline_P07_VacumRobot.txt"
 # ---------------------------------------------------------------------
 
 
@@ -57,7 +57,12 @@ if not online:
 
     joyForward = []         # måling av foroverbevegelse styrestikke
     joySide = []            # måling av sidebevegelse styrestikke
+    Avstand = []        # målinger av lydsensor
 
+    VinkelPosMotorB = []    # vinkelposisjon motor B 
+    HastighetMotorB = []    # hastighet motor B
+    VinkelPosMotorC = []    # vinkelposisjon motor C
+    HastighetMotorC = [] 
     print("B) offline: MEASUREMENTS. LISTS INTITALIZED.")
     # ---------------------------------------------------------------------
 
@@ -84,6 +89,16 @@ if not online:
     TV_B = []           # total variation motor B
     TV_C = []           # total variation motor C
     Avvik = []
+    AvvikFilter = []
+    I = []
+    reverse = []
+    PosX1 = []
+    PosX2 = []
+    PosY1 = []
+    PosY2 = []
+    GyroAngle = [] 
+    vinkel = []         # måling av gyrovinkel fra GyroSensor
+    rTimer = []
     medianLys = []
     STD_Lys = []
 
@@ -158,14 +173,14 @@ else:
 def unpackMeasurement(rowOfMeasurement):
     Tid.append(float(rowOfMeasurement[0]))
     Lys.append(float(rowOfMeasurement[1]))
-    Avstand.append(float(rowOfMeasurement[2]))
-    GyroAngle.append(float(rowOfMeasurement[3]))
+    Avstand.append(float(rowOfMeasurement[3]))
+    GyroAngle.append(float(rowOfMeasurement[2]))
+    VinkelPosMotorB.append(float(rowOfMeasurement[5]))
+    VinkelPosMotorC.append(float(rowOfMeasurement[4]))
 
     # i malen her mangler mange målinger, fyll ut selv det du trenger
 
-    joyForward.append(float(rowOfMeasurement[4]))
-    joySide.append(float(rowOfMeasurement[5]))
-
+    
     # i malen her mangler mange målinger, fyll ut selv det du trenger
 
 # -------------------------------------------------------------
@@ -310,8 +325,8 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C,
-                             joyForward, joySide, PowerB, PowerC, medianLys, STD_Lys)
+            MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,  
+            STD_Lys, Avstand, reverse, GyroAngle, PosX1, PosY1,PosX2,PosY2,rTimer,VinkelPosMotorB,VinkelPosMotorC,vinkel)
             # ---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
@@ -337,7 +352,7 @@ def offline(filenameMeas, filenameCalcOffline):
                 CalculatedToFileHeader += "0=Ts, 1=PowerB, 2=PowerC, \n"
                 CalculatedToFileHeader += "3=IAE, 4=MAE \n"
                 CalculatedToFileHeader += "5=TV_B, 6=TV_C \n"
-                CalculatedToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys \n"
+                CalculatedToFileHeader += "7=Avvik, 8=STD_Lys \n"
                 f.write(CalculatedToFileHeader)
 
                 # Lengde av de MÅLTE listene.
@@ -352,7 +367,7 @@ def offline(filenameMeas, filenameCalcOffline):
                     CalculatedToFile += str(TV_B[i]) + ","
                     CalculatedToFile += str(TV_C[i]) + ","
                     CalculatedToFile += str(Avvik[i]) + ","
-                    CalculatedToFile += str(medianLys[i]) + ","
+                   
                     CalculatedToFile += str(STD_Lys[i]) + "\n"
 
                     f.write(CalculatedToFile)

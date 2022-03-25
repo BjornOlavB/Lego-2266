@@ -411,7 +411,7 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC, middleLys, 
+def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,  
     STD_Lys, Avstand, reverse, GyroAngle, PosX1, PosY1,PosX2,PosY2,rTimer,vinkelPosB,vinkelPosC,vinkel):
 
     # Parametre
@@ -441,7 +441,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
         TV_C.append(0)
         Avvik.append(0)  # Total Variaton motorC
         AvvikFilter.append(0)  # Total Variaton motorC
-        middleLys.append(0)
+      
         STD_Lys.append(0)
         I.append(0)
         PowerB.append(u_0)
@@ -466,16 +466,16 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
         
         rad_a = (GyroAngle[-1]/180)*math.pi
         rad_b = (vinkel[-1]/180)*math.pi
+        print(len(vinkel) == len(Tid))
         if Avstand[-1] <= 150 or Lys[-1] <= 10:
             reverse.append(True)
             rTimer.clear()
+            
         if reverse[-1]:
             
             if sum(rTimer) <= 1:
                     PowerB.append(-u_0)
                     PowerC.append(-u_0)
-
-                    vinkel.append(vinkel[-1])
                     
                     PosX1.append(-speed*math.cos(rad_a)*Ts[-1]+PosX1[-1])
                     PosY1.append(-speed*math.sin(rad_a)*Ts[-1]+PosY1[-1])
@@ -489,9 +489,12 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
                     PowerB.append(u_0)
                     PowerC.append(-u_0)
                     rTimer.append(Ts[-1])
-                    
+                    vinkel.append(vinkel[-1])
                     
             else:
+                    PowerB.append(u_0)
+                    PowerC.append(u_0)
+                    vinkel.append(vinkel[-1])
                     reverse.append(False)
                     
         else:
@@ -514,7 +517,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
         TV_B.append(TV(PowerB[-1], PowerB[-2], TV_B))
         TV_C.append(TV(PowerC[-1], PowerC[-2], TV_C))
 
-        middleLys.append(middleValue(Lys))
+        
 
         STD_Lys.append(STD(Lys[-1], referanse, STD_Lys))
 
