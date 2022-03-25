@@ -33,6 +33,7 @@ import json
 import _thread
 import sys
 import math
+import numpy as np
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #            1) EXPERIMENT SETUP AND FILENAME
@@ -382,7 +383,7 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys,absAvvik,PID_regulator):
+def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,absAvvik,PID_regulator):
 
     # Parametre
     u_0 = 15
@@ -407,7 +408,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         Avvik.append(0)                                      #Total Variaton motorC
         absAvvik.append(0)                                      #Total Variaton motorC
         AvvikFilter.append(0)                                      #Total Variaton motorC
-        middleLys.append(0)                               
+        medianLys.append(0)                               
         STD_Lys.append(0)
         I.append(0)
         PowerB.append(0)
@@ -418,6 +419,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         Ts.append(Tid[-1]-Tid[-2])
 
         Avvik.append(Lys[-1] - referanse)
+        print(IAE[-1])
         absAvvik.append(abs(Lys[-1] - referanse))
         AvvikFilter.append(IIR_filter(Avvik,AvvikFilter,alpha))
 
@@ -434,7 +436,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
         TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
 
-        middleLys.append(middleValue(Lys))
+        medianLys.append(middleValue(Lys))
         
         STD_Lys.append(STD(Lys[-1],referanse,STD_Lys))
         

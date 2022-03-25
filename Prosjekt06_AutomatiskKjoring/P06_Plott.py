@@ -18,7 +18,7 @@ except Exception as e:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = True
+online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
 EV3_IP = "169.254.32.35"
@@ -89,8 +89,11 @@ if not online:
     TV_B = []           # total variation motor B
     TV_C = []           # total variation motor C
     Avvik = []
+    AvvikFilter = []
     absAvvik = []
     medianLys = []
+    medianLys = []
+    I = []
     STD_Lys = []
     PID_regulator = []
     
@@ -131,7 +134,10 @@ else:
     TV_B = []           # total variation motor B
     TV_C = []           # total variation motor C
     Avvik = []
+    AvvikFilter = []
     medianLys = []
+    medianLys = []
+    I = []
     STD_Lys = []
 
     
@@ -297,7 +303,7 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys,absAvvik,PID_regulator)
+            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,absAvvik,PID_regulator)
             #---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
