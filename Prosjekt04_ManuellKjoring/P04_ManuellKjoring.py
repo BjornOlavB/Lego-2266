@@ -137,6 +137,7 @@ def main():
         TV_B = []           # total variation motor B
         TV_C = []           # total variation motor C
         Avvik = []
+        absAvvik = []
 
         medianLys = []
         STD_Lys = []
@@ -229,7 +230,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene.
 
-            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys)
+            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys,absAvvik)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -376,12 +377,12 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,middleLys,STD_Lys):
+def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,middleLys,STD_Lys,absAvvik):
 
     # Parametre
     a = 0.3                                               #'Gir' for bil
     b = 0.6
-    m = 1
+    m = 15
     # Pådragsberegning
     PowerB.append(b*joySide[-1] + a*joyForward[-1])
     PowerC.append(-b*joySide[-1] + a*joyForward[-1])
@@ -394,19 +395,23 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
         TV_B.append(0)                                      #Total Variaton motorB
         TV_C.append(0)
         Avvik.append(0)                                      #Total Variaton motorC
+        absAvvik.append(0)                                      #Total Variaton motorC
         middleLys.append(0)                               
         STD_Lys.append(0)
     else:
         Ts.append(Tid[-1]-Tid[-2])
         Avvik.append(Lys[-1] - referanse)
-        IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
-        MAE.append(mean_abs_error(Avvik, m))   
+        absAvvik.append(abs(Lys[-1] - referanse))
+        IAE.append(EulerForward(absAvvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
+        MAE.append(mean_abs_error(absAvvik, m))   
 
         TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
         TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
 
         middleLys.append(middleValue(Lys))
+        
         STD_Lys.append(STD(Lys[-1],referanse,STD_Lys))
+        
     # Matematiske beregninger
                    #IIR av Lys
 
@@ -418,7 +423,7 @@ def MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joyS
 
 def EulerForward(functionValue, Ts, intValueOld):
     intValueNew = intValueOld + Ts*functionValue
-    return abs(intValueNew)
+    return intValueNew
 
 def TV(functionValue,functionValueOld,TV):
     return TV[-1] + abs(functionValue-functionValueOld)
@@ -433,7 +438,7 @@ def mean_abs_error(list, m):
     # Glatting av målinger i FIR filter
     intValueNew = (1/m)*(sum(list[-m:]))
     # Retunering av utregnet verdi FIR VALUE
-    return abs(intValueNew)
+    return intValueNew
 
 def middleValue(list):
     return (sum(list))/len(list)

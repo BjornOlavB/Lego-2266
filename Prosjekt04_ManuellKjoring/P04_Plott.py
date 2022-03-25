@@ -21,14 +21,14 @@ except Exception as e:
 online = False
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.53.245"
+EV3_IP = "169.254.32.35"
 
 # Hvis online = False, husk å overføre filen med målinger og 
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
 # Bruk 'Upload'-funksjonen
 
 # --> Filnavn for lagrede MÅLINGER som skal lastes inn offline
-filenameMeas = "Meas_P04_BjørnOlav.txt"
+filenameMeas = "Meas_P04_Simon.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres offline
 #     Typisk navn:  "CalcOffline_P0X_BeskrivendeTekst_Y.txt"
@@ -89,6 +89,7 @@ if not online:
     TV_B = []           # total variation motor B
     TV_C = []           # total variation motor C
     Avvik = []
+    absAvvik = []
     medianLys = []
     STD_Lys = []
     
@@ -129,6 +130,7 @@ else:
     TV_B = []           # total variation motor B
     TV_C = []           # total variation motor C
     Avvik = []
+    absAvvik = []
     medianLys = []
     STD_Lys = []
 
@@ -252,7 +254,7 @@ def plotData():
     ax[2,1].plot(Tid[0:], MAE[0:], 'b')
 
 def plotHist():
-    ax2.hist(STD_Lys,edgecolor="black",color="g",align="left")
+    ax2.hist(Lys[0:],edgecolor="black",color="g",align="left", bins=40)
     
 #---------------------------------------------------------------------
 
@@ -296,7 +298,7 @@ def offline(filenameMeas, filenameCalcOffline):
             # beregnet pådrag til motor(ene), selv om pådraget 
             # kan beregnes og plottes.
 
-            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys)
+            MathCalculations(Tid, Lys, Ts, Avvik, IAE, MAE, TV_B, TV_C, joyForward, joySide, PowerB, PowerC,medianLys,STD_Lys,absAvvik)
             #---------------------------------------------------------
 
         # Eksperiment i offline er nå ferdig
