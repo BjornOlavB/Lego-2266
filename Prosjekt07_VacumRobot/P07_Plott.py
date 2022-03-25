@@ -21,7 +21,7 @@ except Exception as e:
 online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
-EV3_IP = "169.254.74.36"
+EV3_IP = "169.254.32.35"
 
 # Hvis online = False, husk å overføre filen med målinger og
 # eventuelt filen med beregnede variable fra EV3 til datamaskinen.
@@ -209,6 +209,7 @@ def unpackData(rowOfData):
     PosX2.append(rowOfData["PosX2"])
     PosY1.append(rowOfData["PosY1"])
     PosY2.append(rowOfData["PosY2"])
+    vinkel.append(rowOfData["vinkel"])
 
 
 # -------------------------------------------------------------
@@ -222,7 +223,7 @@ def unpackData(rowOfData):
 # Dersom både nrows > 1 og ncols > 1,  så må ax gis 2 argumenter
 # som ax[0,0], ax[1,0], osv
 fig, ax = plt.subplots(nrows=3, ncols=2)
-fig2, ax2 = plt.subplots(nrows=1, ncols=1, sharex=True)
+
 
 
 # Vær obs på at ALLE delfigurene må inneholde data.
@@ -233,8 +234,10 @@ def figureTitles():
     ax[0, 1].set_title('Avstand e(k)')
     ax[1, 0].set_title('PowerB (b) PowerC (r)')
     ax[1, 1].set_title('Vinkel')
-    ax[2, 0].set_title('TV_B (b) TV_C (r)')
+    ax[2, 0].set_title('Vinkel Pos (b) Vinkel Pos (c)')
     ax[2, 1].set_title('Position')
+
+    
     # Vær obs på at ALLE delfigurene må inneholde data.
 
     ax[0, 0].set_xlabel('Tid [sec]')
@@ -255,13 +258,13 @@ def plotData():
     ax[1, 0].plot(Tid[0:], PowerB[0:], 'b')
     ax[1, 0].plot(Tid[0:], PowerC[0:], 'r')
     ax[1, 1].plot(Tid[0:], GyroAngle[0:], 'b')
+    ax[1, 1].plot(Tid[0:], vinkel[0:], 'r')
     ax[2, 0].plot(Tid[0:], VinkelPosMotorB[0:], 'b')
     ax[2, 0].plot(Tid[0:], VinkelPosMotorC[0:], 'c')
-    ax[2, 1].plot()
+    ax[2, 1].plot(PosX1[0:],PosY1[0:],'g')
+    ax[2, 1].plot(PosX2[0:],PosY2[0:],'r')
 
-def plotPosition():
-    ax2.plot(PosX1[0:],PosY1[0:],"g")
-    ax2.plot(PosX2[0:],PosY2[0:],"r")
+
 
 
 
@@ -358,7 +361,7 @@ def offline(filenameMeas, filenameCalcOffline):
     # Plot data (målinger og beregnede verdier) fra listene.
     figureTitles()
     plotData()
-    plotPosition()
+    
     stopPlot()
 
     # Set plot layout and show plot.

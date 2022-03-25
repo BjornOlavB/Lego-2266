@@ -34,7 +34,7 @@ import _thread
 import sys
 import math
 import random
-from turtle import distance
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #            1) EXPERIMENT SETUP AND FILENAME
@@ -98,7 +98,7 @@ def main():
         # at listene i utgangspunktet er tomme.
         #
         # Listene med målinger fylles opp i seksjon
-        #  --> 5) GET TIME AND MEASUREMENT
+        #  --> g) GET TIME AND MEASUREMENT
         # og lagres til .txt-filen i seksjon
         #  --> 6) STORE MEASUREMENTS TO FILE
 
@@ -186,7 +186,7 @@ def main():
 
             Lys.append(myColorSensor.reflection())
             Avstand.append(myUltrasonicSensor.distance())
-            GyroAngle.append(-myGyroSensor.angle())
+            GyroAngle.append(myGyroSensor.angle())
 
             VinkelPosMotorB.append(motorB.angle())
             HastighetMotorB.append(motorB.speed())
@@ -282,7 +282,7 @@ def main():
                     CalculationsToFileHeader += "3=IAE, 4=MAE \n"
                     CalculationsToFileHeader += "5=VinkelPosMotorC, 6=VinkelPosMotorB \n"
                     CalculationsToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys \n"
-                    CalculationsToFileHeader += "10=GyroAngle, 11=PosX, 12=PosY \n"
+                    CalculationsToFileHeader += "10=GyroAngle, 11=PosX1, 12=PosY1, 13=PosX2, 14=PosY2 \n"
                     robot["calculations"].write(CalculationsToFileHeader)
                 CalculationsToFile = ""
                 CalculationsToFile += str(Ts[-1]) + ","
@@ -296,8 +296,10 @@ def main():
                 CalculationsToFile += str(medianLys[-1]) + ","
                 CalculationsToFile += str(STD_Lys[-1]) + ","
                 CalculationsToFile += str(GyroAngle[-1]) + ","
-                CalculationsToFile += str(PosX[-1]) + ","
-                CalculationsToFile += str(PosY[-1]) + "\n"
+                CalculationsToFile += str(PosX1[-1]) + ","
+                CalculationsToFile += str(PosY1[-1]) + ","
+                CalculationsToFile += str(PosX2[-1]) + "\n"
+                CalculationsToFile += str(PosY2[-1]) + "\n"
 
                 # Skriv CalcultedToFile til .txt-filen navngitt i seksjon 1)
                 robot["calculations"].write(CalculationsToFile)
@@ -349,6 +351,7 @@ def main():
                 DataToOnlinePlot["PosX2"] = (PosX2[-1])
                 DataToOnlinePlot["PosY1"] = (PosY1[-1])
                 DataToOnlinePlot["PosY2"] = (PosY2[-1])
+                DataToOnlinePlot["vinkel"] = (vinkel[-1])
                 
 
                 # sender over data
@@ -413,9 +416,10 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
 
     # Parametre
     u_0 = 135
-    d = 17.25
+    c = 17.25  # circumfurnece of wheel
     rps = 360/u_0
-    speed = d*rps  # speed
+    speed = c*rps  # speed
+    lenght = 6.25 # cm - axel length
     a = 0.3  # 'Gir' for bil
     b = 0.6
     Kp = 3.5
@@ -458,9 +462,10 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
 
         # Pådragsberegning
         # Checks distance to wall
-        vinkel.append(vinkelPosB[-1]-vinkelPosC[-1])
-        rad_b = (vinkel[-1]/180)*math.pi
+        
+        
         rad_a = (GyroAngle[-1]/180)*math.pi
+        rad_b = (vinkel[-1]/180)*math.pi
         if Avstand[-1] <= 150 or Lys[-1] <= 10:
             reverse.append(True)
             rTimer.clear()
@@ -469,25 +474,34 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
             if sum(rTimer) <= 1:
                     PowerB.append(-u_0)
                     PowerC.append(-u_0)
+
+                    vinkel.append(vinkel[-1])
                     
                     PosX1.append(-speed*math.cos(rad_a)*Ts[-1]+PosX1[-1])
                     PosY1.append(-speed*math.sin(rad_a)*Ts[-1]+PosY1[-1])
                     PosX2.append(-speed*math.cos(rad_b)*Ts[-1]+PosX2[-1])
                     PosY2.append(-speed*math.sin(rad_b)*Ts[-1]+PosY2[-1])
+                    vinkel.append(radianCalc((c/360)*(vinkelPosB[-1]-vinkelPosB[-2]),lenght)*(180/math.pi))
                     rTimer.append(Ts[-1])
+                    
             elif sum(rTimer) <= 2:
                     
                     PowerB.append(u_0)
                     PowerC.append(-u_0)
                     rTimer.append(Ts[-1])
+                    
+                    
             else:
                     reverse.append(False)
+                    
         else:
             PowerB.append(u_0)
             PowerC.append(u_0)
 
         # Postion Calulation
+            vinkel.append(vinkel[-1])
             
+
             PosX1.append(speed*math.cos(rad_a)*Ts[-1]+PosX1[-1])
             PosY1.append(speed*math.sin(rad_a)*Ts[-1]+PosY1[-1])
             PosX2.append(speed*math.cos(rad_b)*Ts[-1]+PosX2[-1])
@@ -508,7 +522,9 @@ def MathCalculations(Tid, Lys, Ts, Avvik, AvvikFilter, IAE, MAE, TV_B, TV_C, I, 
 
 
 # ---------------------------------------------------------------------
-
+def radianCalc(arcLength,radius):
+    theta = arcLength/radius
+    return theta
 def PID(u_0, Kp, Kd, e_t, ef_t, I, ts):
     # u_0        -->    Base pull
     # Kp, Ki, Kd -->    Constants
