@@ -137,8 +137,10 @@ def main():
         TV_B = []           # total variation motor B
         TV_C = []           # total variation motor C
         Avvik = []
+        absAvvik = []
         AvvikFilter = []
         I = []
+        PID_regulator = []
         
 
         medianLys = []
@@ -232,7 +234,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene.
 
-            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys)
+            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,absAvvik,PID)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -379,15 +381,15 @@ def main():
 # eller i seksjonene
 #   - seksjonene H) og 12) for offline bruk
 
-def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys):
+def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,middleLys,STD_Lys,absAvvik,PID_regulator):
 
     # Parametre
     u_0 = 15
     a = 0.3                                               #'Gir' for bil
     b = 0.6
-    Kp = 3.5
-    Ki = 1.4
-    Kd = 0.3
+    Kp = 1.2
+    Ki = 1.6
+    Kd = 1.4
     m = 15
     alpha = 0.3
     #Avvik beregning
@@ -402,27 +404,31 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
         TV_B.append(0)                                      #Total Variaton motorB
         TV_C.append(0)
         Avvik.append(0)                                      #Total Variaton motorC
+        absAvvik.append(0)                                      #Total Variaton motorC
         AvvikFilter.append(0)                                      #Total Variaton motorC
         middleLys.append(0)                               
         STD_Lys.append(0)
         I.append(0)
         PowerB.append(0)
         PowerC.append(0)
+        PID_regulator.append(0)
         
     else:
         Ts.append(Tid[-1]-Tid[-2])
 
         Avvik.append(Lys[-1] - referanse)
+        absAvvik.append(abs(Lys[-1] - referanse))
         AvvikFilter.append(IIR_filter(Avvik,AvvikFilter,alpha))
 
         I.append(EulerForward(Ki*Avvik[-1],Ts[-1],I[-1]))
         
         # Pådragsberegning
+        PID_regulator.append(PID(u_0,Kp,Kd,Avvik,AvvikFilter,I,Ts))
         PowerB.append(u_0 + PID(u_0,Kp,Kd,Avvik,AvvikFilter,I,Ts))
         PowerC.append(u_0 - PID(u_0,Kp,Kd,Avvik,AvvikFilter,I,Ts))
         
-        IAE.append(EulerForward(Avvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
-        MAE.append(mean_abs_error(Avvik, m))   
+        IAE.append(EulerForward(absAvvik[-1], Ts[-1], IAE[-1]))                #Numerisk integrasjon av Lys - referanse 
+        MAE.append(mean_abs_error(absAvvik, m))   
 
         TV_B.append(TV(PowerB[-1],PowerB[-2],TV_B))
         TV_C.append(TV(PowerC[-1],PowerC[-2],TV_C))
@@ -454,7 +460,7 @@ def IIR_filter(list,IIR_prev,alpha):
 
 def EulerForward(functionValue, Ts, intValueOld):
     intValueNew = intValueOld + Ts*functionValue
-    return abs(intValueNew)
+    return intValueNew
 
 def Derivasjon(functionValue,dt):
     
@@ -474,7 +480,7 @@ def mean_abs_error(list, m):
     # Glatting av målinger i FIR filter
     intValueNew = (1/m)*(sum(list[-m:]))
     # Retunering av utregnet verdi FIR VALUE
-    return abs(intValueNew)
+    return intValueNew
 
 def middleValue(list):
     return (sum(list))/len(list)
