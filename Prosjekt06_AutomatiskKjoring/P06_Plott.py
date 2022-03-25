@@ -18,7 +18,7 @@ except Exception as e:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #     A) online and offline: SET ONLINE FLAG, IP-ADRESSE OG FILENAME
 #
-online = False
+online = True
 
 # Hvis online = True, pass på at IP-adresse er satt riktig.
 EV3_IP = "169.254.32.35"

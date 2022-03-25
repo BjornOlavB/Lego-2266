@@ -41,13 +41,13 @@ import math
 wired = True
 
 # --> Filnavn for lagring av MÅLINGER som gjøres online
-filenameMeas = "Meas_P05_AutoKjøring.txt"
+filenameMeas = "Meas_P05_AutoKjøring_PI.txt"
 
 # --> Filnavn for lagring av BEREGNEDE VARIABLE som gjøres online
 #     Typisk navn:  "CalcOnline_P0X_BeskrivendeTekst_Y.txt"
 #     Dersom du ikke vil lagre BEREGNEDE VARIABLE, la det stå
 #     filenameCalcOnline = ".txt"
-filenameCalcOnline = "CalcOnline_P05_AutoKjøring.txt"
+filenameCalcOnline = "CalcOnline_P05_AutoKjøring_PI.txt"
 # --------------------------------------------------------------------
 
 
@@ -234,7 +234,7 @@ def main():
             # fall kommentere bort kallet til MathCalculations()
             # nedenfor. Du må også kommentere bort motorpådragene.
 
-            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,absAvvik,PID)
+            MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, PowerB, PowerC,medianLys,STD_Lys,absAvvik,PID_regulator)
 
             # Hvis motor(er) brukes i prosjektet så sendes til slutt
             # beregnet pådrag til motor(ene).
@@ -266,7 +266,7 @@ def main():
                     CalculationsToFileHeader += "0=Ts, 1=PowerB, 2=PowerC, \n"
                     CalculationsToFileHeader += "3=IAE, 4=MAE \n"
                     CalculationsToFileHeader += "5=TV_B, 6=TV_C \n"
-                    CalculationsToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys \n"
+                    CalculationsToFileHeader += "7=Avvik, 8=MedianLys, 9=STD_Lys 10=PI \n"
                     robot["calculations"].write(CalculationsToFileHeader)
                 CalculationsToFile = ""
                 CalculationsToFile += str(Ts[-1]) + ","
@@ -278,7 +278,8 @@ def main():
                 CalculationsToFile += str(TV_C[-1]) + ","
                 CalculationsToFile += str(Avvik[-1]) + ","
                 CalculationsToFile += str(medianLys[-1]) + ","
-                CalculationsToFile += str(STD_Lys[-1]) + "\n"
+                CalculationsToFile += str(STD_Lys[-1]) + ","
+                CalculationsToFile += str(PID_regulator[-1]) + "\n"
 
                 # Skriv CalcultedToFile til .txt-filen navngitt i seksjon 1)
                 robot["calculations"].write(CalculationsToFile)
@@ -387,9 +388,9 @@ def MathCalculations(Tid, Lys, Ts, Avvik,AvvikFilter, IAE, MAE, TV_B, TV_C, I, P
     u_0 = 15
     a = 0.3                                               #'Gir' for bil
     b = 0.6
-    Kp = 1.2
-    Ki = 1.6
-    Kd = 1.4
+    Kp = 1.4
+    Ki = 1.7
+    Kd = 0
     m = 15
     alpha = 0.3
     #Avvik beregning
